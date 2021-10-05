@@ -6,3 +6,4 @@
 *.gpkg
 *.zip
 *.json
+.dump_model/*

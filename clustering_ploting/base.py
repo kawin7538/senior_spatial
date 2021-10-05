@@ -1,4 +1,6 @@
 import matplotlib
+import gc
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from copy import deepcopy
@@ -8,6 +10,10 @@ from data_loading import DataLoading
 class BaseCluster:
     def __init__(self,data:DataLoading,multiplier=100000) -> None:
         # self.data=data.multiply_value(multiplier)
+
+        if not os.path.exists('.dump_model/'):
+            os.makedirs('.dump_model/')
+
         self.data=deepcopy(data)
         self.multiplier=multiplier
         self._get_multiplier()
@@ -69,6 +75,9 @@ class BaseCluster:
             for type_keyword in self.data.list_type_keyword:
                 self._save_global_cluster_csv(data_keyword,type_keyword)
 
+        del data_keyword,type_keyword
+        gc.collect()
+
     def _save_global_cluster_csv(self,data_keyword,type_keyword):
         global_g_df=pd.DataFrame()
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
@@ -79,6 +88,9 @@ class BaseCluster:
         for data_keyword in ['case','death']:
             for type_keyword in self.data.list_type_keyword:
                 self._save_local_cluster_csv(data_keyword,type_keyword)
+        
+        del data_keyword,type_keyword
+        gc.collect()
 
     def _save_local_cluster_csv(self,data_keyword,type_keyword):
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
@@ -101,6 +113,9 @@ class BasePlot:
                 for year in tqdm(self.range_year,desc=f"{self.keyword} {data_keyword} {type_keyword}"):
                     self._make_local_cluster_plot(year,data_keyword,type_keyword,self.data.list_type_keyword.index(type_keyword))
                     plt.savefig(self.path.format(data_keyword,type_keyword,year))
+        
+        del data_keyword,type_keyword,year
+        gc.collect()
 
     def _make_local_cluster_plot(self,year:int,data_keyword,type_keyword,idx):
         fig,ax=plt.subplots(1,figsize=(9,12))
