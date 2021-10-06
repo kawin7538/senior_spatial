@@ -4,9 +4,11 @@ from libpysal.weights import Queen, W
 class GEOPackage:
     def __init__(self,**kwargs) -> None:
         super().__init__(**kwargs)
+        print("\tGeoPackage Data Loading",end='\r')
         self.map=self._read_file("gadm36_THA.gpkg","gadm36_THA_1")
         self.w=self._read_weight(Queen)
         self.w=self._custom_weight(38,47,1)
+        print("\tGeoPackage Data Loaded---")
 
     def _read_file(self,file_path,file_layer):
         return geopandas.read_file(file_path,layer=file_layer)

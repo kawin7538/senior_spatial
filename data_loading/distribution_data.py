@@ -3,6 +3,7 @@ import pandas as pd
 class Distribution_Data:
     def __init__(self,load_ratio=True,range_year=range(2011,2021),**kwargs) -> None:
         super().__init__(**kwargs)
+        print("\tDistribition Data Loading",end='\r')
         self.load_ratio=load_ratio
         self.ratio_keyword='_ratio' if load_ratio else ''
         self.range_year=range_year
@@ -16,6 +17,7 @@ class Distribution_Data:
         # self.list_case_minmax_value=self._get_list_minmax_value(data_keyword='case')
         self.list_death_df=self._custom_edit_data(self._read_csv_list(data_keyword='death'))
         # self.list_death_minmax_value=self._get_list_minmax_value(data_keyword='death')
+        print("\tDistribution Data Loaded---")
 
     def _read_csv_list(self,data_keyword='case'):
         list_df=[]

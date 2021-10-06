@@ -1,16 +1,20 @@
 import copy
-from .geopackage import GEOPackage
+
 from .distribution_data import Distribution_Data
+from .geopackage import GEOPackage
+
 
 class DataLoading(GEOPackage,Distribution_Data):
     def __init__(self,load_ratio=True,range_year=range(2011,2021)) -> None:
         # GEOPackage.__init__(self)
         # Distribution_Data.__init__(self,load_ratio=True)
+        print("Data Loading")
         super(DataLoading,self).__init__(load_ratio=load_ratio,range_year=range_year)
         self.list_case_map=self._merge(self.list_case_df)
         self.list_case_minmax_value=self._get_list_minmax_value(data_keyword='case')
         self.list_death_map=self._merge(self.list_death_df)
         self.list_death_minmax_value=self._get_list_minmax_value(data_keyword='death')
+        print("Data Loaded")
 
     def _merge(self,list_df):
         list_map=[]
