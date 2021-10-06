@@ -1,13 +1,17 @@
-from matplotlib import pyplot as plt
+import gc
+import pickle
+
 import pandas as pd
 from data_loading import DataLoading
-from tqdm import tqdm
-import pickle
-import gc
-from .base import BaseCluster, BasePlot
 from esda.moran import Moran, Moran_Local
+from matplotlib import pyplot as plt
 from splot._viz_utils import mask_local_auto
-from splot.esda import plot_local_autocorrelation,lisa_cluster
+from splot.esda import (lisa_cluster, moran_scatterplot,
+                        plot_local_autocorrelation)
+from tqdm import tqdm
+
+from .base import BaseCluster, BasePlot
+
 
 class MoranCluster(BaseCluster):
     def __init__(self, data: DataLoading, multiplier=100000,permutations=9999,p_value=0.05) -> None:
@@ -105,7 +109,7 @@ class LISAPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
         super().__init__(cluster)
         self.keyword="LISA Plot"
-        self.path="output/moran/{}/{}/{}.png"
+        self.path="output/moran/{}/{}/LISA_{}.png"
     
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
         fig,ax=plt.subplots(1,figsize=(9,12))
@@ -123,3 +127,22 @@ class LISAPlot(BasePlot):
 
         del moran_local,map_with_data,y
         gc.collect()
+
+class MoranLocalScatterPlot(BasePlot):
+    def __init__(self, cluster: BaseCluster) -> None:
+        super().__init__(cluster)
+        self.keyword="Moran Scatter Plot"
+        self.path="output/moran/{}/{}/MoranScatter_{}.png"
+
+    def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
+        map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+        y=map_with_data[map_with_data['year']==year].fillna(0)
+
+        file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
+        moran_local=pickle.load(file)
+        file.close()
+
+        fig, ax = plt.subplots(1,figsize=(12,12))
+        moran_scatterplot(moran_local,p=self.cluster.p_value,ax=ax)
+        ax.set_xlabel(f"{data_keyword}_{type_keyword}")
+        ax.set_ylabel(f"Spatial Lag of {data_keyword}_{type_keyword}")

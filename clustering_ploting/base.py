@@ -121,8 +121,12 @@ class BasePlot:
         for data_keyword in ['case','death']:
             for type_keyword in self.data.list_type_keyword:
                 for year in tqdm(self.range_year,desc=f"{self.keyword} {data_keyword} {type_keyword}"):
-                    self._make_local_cluster_plot(year,data_keyword,type_keyword,self.data.list_type_keyword.index(type_keyword))
-                    plt.savefig(self.path.format(data_keyword,type_keyword,year))
+                    try:
+                        self._make_local_cluster_plot(year,data_keyword,type_keyword,self.data.list_type_keyword.index(type_keyword))
+                        plt.savefig(self.path.format(data_keyword,type_keyword,year),dpi=300)
+                    except:
+                        print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
+                        continue;
         
         del data_keyword,type_keyword,year
         gc.collect()
@@ -132,4 +136,4 @@ class BasePlot:
 
     def plot_preview(self):
         self._make_local_cluster_plot(2011,'case','DF',self.data.list_type_keyword.index('DF'))
-        plt.savefig("plot_preview.png")
+        plt.savefig("plot_preview.png",dpi=300)
