@@ -1,6 +1,7 @@
 import warnings
 
 from clustering_ploting.gstarclustering import GStarCluster, GStarPlot
+from clustering_ploting.moranclustering import LISAPlot, MoranCluster
 
 warnings.filterwarnings("ignore")
 
@@ -25,3 +26,10 @@ if __name__ == '__main__':
     # plot_obj=GStarPlot(cluster_obj)
     # plot_obj.plot_preview()
     # plot_obj.save_local_cluster_plot_png()
+
+    cluster_obj=MoranCluster(data,100000,p_value=0.05)
+    # cluster_obj.save_global_cluster_csv()
+    # cluster_obj.save_local_cluster_csv()
+    plot_obj=LISAPlot(cluster_obj)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()

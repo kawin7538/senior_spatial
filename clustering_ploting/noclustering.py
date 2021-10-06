@@ -4,12 +4,13 @@ from matplotlib import colors
 
 from .base import BaseCluster, BasePlot
 
-
 class NoCluster(BaseCluster):
     def __init__(self, data: DataLoading, multiplier) -> None:
         super().__init__(data, multiplier=multiplier)
         self.global_keyword="No_Cluster"
         self.local_keyword="No_Cluster"
+
+        self._set_output_folder('distribution')
 
 class NoPlot(BasePlot):
     def __init__(self, cluster: BaseCluster,gamma) -> None:

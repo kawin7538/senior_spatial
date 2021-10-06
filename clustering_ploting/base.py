@@ -27,6 +27,14 @@ class BaseCluster:
         self.global_path="output/g_local_test.csv"
         self.range_year=self.data.range_year
 
+    def _set_output_folder(self,keyword):
+        # if not os.path.exists(f'{keyword}/'):
+        #     os.makedirs(f'{keyword}/')
+        for data_keyword in ['case','death']:
+            for type_keyword in ['DF','DHF','DSS']:
+                if not os.path.exists(f'output/{keyword}/{data_keyword}/{type_keyword}/'):
+                    os.makedirs(f'output/{keyword}/{data_keyword}/{type_keyword}/')
+
     def _get_multiplier(self):
         for type_keyword in self.data.list_type_keyword:
             self.data.list_case_map[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_case_map[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
