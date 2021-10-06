@@ -1,11 +1,13 @@
-import matplotlib
 import gc
 import os
-import pandas as pd
-import matplotlib.pyplot as plt
 from copy import deepcopy
-from tqdm import tqdm
+
+import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 from data_loading import DataLoading
+from tqdm import tqdm
+
 
 class BaseCluster:
     def __init__(self,data:DataLoading,multiplier=100000) -> None:

@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
-from matplotlib import colors
 from data_loading import DataLoading
+from matplotlib import colors
+
 from .base import BaseCluster, BasePlot
+
 
 class NoCluster(BaseCluster):
     def __init__(self, data: DataLoading, multiplier) -> None:

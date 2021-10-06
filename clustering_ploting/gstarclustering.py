@@ -1,12 +1,16 @@
 import gc
-from esda.getisord import G_Local
-from matplotlib import colors, pyplot as plt
-import pandas as pd
 import pickle
-from esda import G
-from tqdm import tqdm
+
+import pandas as pd
 from data_loading import DataLoading
+from esda import G
+from esda.getisord import G_Local
+from matplotlib import colors
+from matplotlib import pyplot as plt
+from tqdm import tqdm
+
 from .base import BaseCluster, BasePlot
+
 
 class GStarCluster(BaseCluster):
     def __init__(self, data: DataLoading, multiplier,permutations=9999) -> None:
@@ -46,9 +50,9 @@ class GStarCluster(BaseCluster):
             map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
             y=map_with_data[map_with_data['year']==year]
 
-            self.data.set_inner_loop(77,1)
+            # self.data.set_inner_loop(77,1)
             gistar_local=G_Local(y["total"],self.data.get_weight(),transform='b',star=True,permutations=self.permutations)
-            self.data.set_inner_loop(77,0)
+            # self.data.set_inner_loop(77,0)
 
             file = open(self.local_dump_model_path.format(data_keyword,type_keyword,year),'wb')
             pickle.dump(gistar_local,file)
