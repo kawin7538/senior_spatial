@@ -34,6 +34,7 @@ class BaseCluster:
             for type_keyword in ['DF','DHF','DSS']:
                 if not os.path.exists(f'output/{keyword}/{data_keyword}/{type_keyword}/'):
                     os.makedirs(f'output/{keyword}/{data_keyword}/{type_keyword}/')
+                    print(f'\toutput/{keyword}/{data_keyword}/{type_keyword}/ not existed, create it')
 
     def _get_multiplier(self):
         for type_keyword in self.data.list_type_keyword:
