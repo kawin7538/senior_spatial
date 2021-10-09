@@ -39,8 +39,6 @@ class Distribution_Data:
         temp_df['year']=list_df[0]['year']
         list_df.append(temp_df.copy())
 
-        temp_df.to_csv("csv_preview.csv",index=False)
-
         del temp_df
         gc.collect()
 
