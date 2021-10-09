@@ -37,6 +37,8 @@ class BaseCluster:
                     print(f'\t{self.data.base_output_path}/{keyword}/{data_keyword}/{type_keyword}/ not existed, create it')
 
     def _get_multiplier(self):
+        if not self.data.load_ratio:
+            return ;
         for type_keyword in self.data.list_type_keyword:
             self.data.list_case_map[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_case_map[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
             self.data.list_death_map[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_death_map[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
