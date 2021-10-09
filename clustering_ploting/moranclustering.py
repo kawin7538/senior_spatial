@@ -18,11 +18,11 @@ class MoranCluster(BaseCluster):
         super().__init__(data, multiplier=multiplier)
         self.global_keyword="Moran_Global"
         self.global_dump_model_path=".dump_model/moran_global_{}_{}_{}"
-        self.global_path="output/moran/{}/{}/moran_global.csv"
+        self.global_path="{}/moran/{}/{}/moran_global.csv"
         self.local_keyword="Moran_local"
         self.local_dump_model_path=".dump_model/LISA_{}_{}_{}"
-        self.local_path="output/moran/{}/{}/LISA_{}.csv"
-        self.local_path_sig="output/moran/{}/{}/LISA_{}_sig.csv"
+        self.local_path="{}/moran/{}/{}/LISA_{}.csv"
+        self.local_path_sig="{}/moran/{}/{}/LISA_{}_sig.csv"
         self.p_value=p_value
         self.permutations=permutations
         self.range_year=self.data.range_year
@@ -82,7 +82,7 @@ class MoranCluster(BaseCluster):
             del moran_global,file
             gc.collect()
 
-        global_moran_df.to_csv(self.global_path.format(data_keyword,type_keyword),index=False)
+        global_moran_df.to_csv(self.global_path.format(self.data.base_output_path,data_keyword,type_keyword),index=False)
 
         del global_moran_df
         gc.collect()
@@ -99,8 +99,8 @@ class MoranCluster(BaseCluster):
             y=map_with_data[map_with_data['year']==year]
 
             temp_result=y.assign(moran_value=moran_local.Is,moran_z=moran_local.z,moran_p_value=moran_local.p_sim,cl=mask_local_auto(moran_local,p=self.p_value)[3])
-            temp_result[['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path.format(data_keyword,type_keyword,year),index=False)
-            temp_result.loc[temp_result['moran_p_value']<=self.p_value,['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path_sig.format(data_keyword,type_keyword,year),index=False)
+            temp_result[['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+            temp_result.loc[temp_result['moran_p_value']<=self.p_value,['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
 
             del file,moran_local,map_with_data,y,temp_result
             gc.collect()
@@ -109,7 +109,7 @@ class LISAPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
         super().__init__(cluster)
         self.keyword="LISA Plot"
-        self.path="output/moran/{}/{}/LISA_{}.png"
+        self.path="{}/moran/{}/{}/LISA_{}.png"
     
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
         fig,ax=plt.subplots(1,figsize=(9,12))
@@ -123,7 +123,7 @@ class LISAPlot(BasePlot):
         lisa_cluster(moran_local,y,ax=ax,p=self.cluster.p_value)
         ax.set_axis_off()
 
-        plt.title('{} {} {} {}'.format(data_keyword,type_keyword,self.keyword,year))
+        plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
 
         del moran_local,map_with_data,y
         gc.collect()
@@ -132,7 +132,7 @@ class MoranLocalScatterPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
         super().__init__(cluster)
         self.keyword="Moran Scatter Plot"
-        self.path="output/moran/{}/{}/MoranScatter_{}.png"
+        self.path="{}/moran/{}/{}/MoranScatter_{}.png"
 
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
         map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
