@@ -31,10 +31,10 @@ class BaseCluster:
         # if not os.path.exists(f'{keyword}/'):
         #     os.makedirs(f'{keyword}/')
         for data_keyword in ['case','death']:
-            for type_keyword in ['DF','DHF','DSS']:
-                if not os.path.exists(f'output/{keyword}/{data_keyword}/{type_keyword}/'):
-                    os.makedirs(f'output/{keyword}/{data_keyword}/{type_keyword}/')
-                    print(f'\toutput/{keyword}/{data_keyword}/{type_keyword}/ not existed, create it')
+            for type_keyword in ['DF','DHF','DSS','ALL']:
+                if not os.path.exists(f'{self.data.base_output_path}/{keyword}/{data_keyword}/{type_keyword}/'):
+                    os.makedirs(f'{self.data.base_output_path}/{keyword}/{data_keyword}/{type_keyword}/')
+                    print(f'\t{self.data.base_output_path}/{keyword}/{data_keyword}/{type_keyword}/ not existed, create it')
 
     def _get_multiplier(self):
         for type_keyword in self.data.list_type_keyword:
@@ -124,7 +124,7 @@ class BasePlot:
                 for year in tqdm(self.range_year,desc=f"{self.keyword} {data_keyword} {type_keyword}"):
                     try:
                         self._make_local_cluster_plot(year,data_keyword,type_keyword,self.data.list_type_keyword.index(type_keyword))
-                        plt.savefig(self.path.format(data_keyword,type_keyword,year),dpi=300)
+                        plt.savefig(self.path.format(self.data.base_output_path,data_keyword,type_keyword,year),dpi=300)
                     except:
                         print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
                         continue;
