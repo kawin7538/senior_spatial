@@ -24,7 +24,7 @@ class Distribution_Data:
         print("\tDistribution Data Loaded---")
 
     def _config_base_output_path(self,load_ratio):
-        return 'output/ratio/'if load_ratio else 'output/raw/'
+        return 'output/ratio'if load_ratio else 'output/raw'
 
     def _read_csv_list(self,data_keyword='case'):
         list_df=[]
