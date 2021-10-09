@@ -93,7 +93,7 @@ class BaseCluster:
         global_g_df=pd.DataFrame()
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
             pass;
-        global_g_df.to_csv(self.global_path.format(data_keyword,type_keyword),index=False)
+        global_g_df.to_csv(self.global_path.format(self.data.base_output_path,data_keyword,type_keyword),index=False)
 
     def save_local_cluster_csv(self):
         for data_keyword in ['case','death']:
