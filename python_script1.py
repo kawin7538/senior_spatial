@@ -8,6 +8,7 @@ from clustering_ploting.moranclustering import (LISAPlot, MoranCluster,
                                                 MoranLocalScatterPlot)
 from clustering_ploting.noclustering import NoCluster, NoPlot
 from data_loading import DataLoading
+from data_loading.corr_customize_data import CorrCustomizeData
 from summary_plotting.summarydistplot import SummaryDistPlot
 
 warnings.filterwarnings("ignore")
@@ -15,19 +16,23 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
 
     data=DataLoading(
-        load_ratio=False,
+        load_ratio=True,
         range_year=range(2011,2021),
     )
 
-    cluster_obj=NoCluster(data,100000)
-    plot_obj=NoPlot(cluster_obj,1)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
+    corr_data=CorrCustomizeData(data)
 
-    SummaryDistPlot(plot_obj).save_png()
+    print(corr_data.corr_data)
 
-    del cluster_obj,plot_obj
-    gc.collect()
+    # cluster_obj=NoCluster(data,100000)
+    # plot_obj=NoPlot(cluster_obj,1)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
+
+    # SummaryDistPlot(plot_obj).save_png()
+
+    # del cluster_obj,plot_obj
+    # gc.collect()
 
     # cluster_obj=GStarCluster(data,100000)
     # cluster_obj.save_global_cluster_csv()
