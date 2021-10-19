@@ -14,7 +14,7 @@ from summary_plotting.summarydistplot import SummaryDistPlot
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-
+    
     data=DataLoading(
         load_ratio=True,
         range_year=range(2011,2021),
@@ -22,7 +22,9 @@ if __name__ == '__main__':
 
     corr_data=CorrCustomizeData(data)
 
-    print(corr_data.corr_data)
+    # print(corr_data.corr_data)
+
+    corr_data.save_csv()
 
     # cluster_obj=NoCluster(data,100000)
     # plot_obj=NoPlot(cluster_obj,1)
