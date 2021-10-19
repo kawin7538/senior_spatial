@@ -1,12 +1,14 @@
 import gc
-import pandas as pd
-from scipy.stats.stats import weightedtau
-from data_loading import DataLoading
-from scipy.stats import pearsonr,spearmanr,kendalltau
+import os
 from copy import deepcopy
+
+import pandas as pd
+from scipy.stats import kendalltau, pearsonr, spearmanr
+from scipy.stats.stats import weightedtau
 from tqdm import tqdm
 
-import os
+from data_loading import DataLoading
+
 
 class CorrCustomizeData:
     def __init__(self,raw_data:DataLoading, func_keyword='pearsonr'):

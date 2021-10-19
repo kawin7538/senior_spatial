@@ -1,8 +1,8 @@
-from numpy import little_endian
-from data_loading.corr_customize_data import CorrCustomizeData
-from tqdm import tqdm
 import matplotlib.pyplot as plt
+from data_loading.corr_customize_data import CorrCustomizeData
 from matplotlib import colors
+from tqdm import tqdm
+
 
 class SpatialCorrPlot:
     def __init__(self,corr_data:CorrCustomizeData):
