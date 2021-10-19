@@ -1,5 +1,6 @@
 import gc
 import pandas as pd
+from scipy.stats.stats import weightedtau
 from data_loading import DataLoading
 from scipy.stats import pearsonr,spearmanr,kendalltau
 from copy import deepcopy
@@ -21,6 +22,7 @@ class CorrCustomizeData:
             'pearsonr':pearsonr,
             'spearmanr':spearmanr,
             'kendalltau':kendalltau,
+            'weightedtau':weightedtau
         }
         assert func_keyword in func_dict.keys(), f"{func_keyword} not in avaiable keywords"
         return func_dict[func_keyword]

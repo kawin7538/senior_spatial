@@ -21,7 +21,7 @@ if __name__ == '__main__':
         range_year=range(2011,2021),
     )
 
-    corr_data=CorrCustomizeData(data,func_keyword='pearsonr')
+    corr_data=CorrCustomizeData(data,func_keyword='weightedtau')
     corr_data.save_csv()
 
     # print(corr_data.corr_data)
