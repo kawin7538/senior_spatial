@@ -7,6 +7,7 @@ from clustering_ploting.gstarclustering import GStarCluster, GStarPlot
 from clustering_ploting.moranclustering import (LISAPlot, MoranCluster,
                                                 MoranLocalScatterPlot)
 from clustering_ploting.noclustering import NoCluster, NoPlot
+from clustering_ploting.spatialcorrplot import SpatialCorrPlot
 from data_loading import DataLoading
 from data_loading.corr_customize_data import CorrCustomizeData
 from summary_plotting.summarydistplot import SummaryDistPlot
@@ -14,17 +15,19 @@ from summary_plotting.summarydistplot import SummaryDistPlot
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-    
+
     data=DataLoading(
-        load_ratio=True,
+        load_ratio=False,
         range_year=range(2011,2021),
     )
 
-    corr_data=CorrCustomizeData(data)
+    corr_data=CorrCustomizeData(data,func_keyword='pearsonr')
+    corr_data.save_csv()
 
     # print(corr_data.corr_data)
 
-    corr_data.save_csv()
+    corr_plot=SpatialCorrPlot(corr_data)
+    corr_plot.make_plot()
 
     # cluster_obj=NoCluster(data,100000)
     # plot_obj=NoPlot(cluster_obj,1)
