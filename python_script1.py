@@ -10,6 +10,7 @@ from clustering_ploting.noclustering import NoCluster, NoPlot
 from clustering_ploting.spatialcorrplot import SpatialCorrPlot
 from data_loading import DataLoading
 from data_loading.corr_customize_data import CorrCustomizeData
+from data_loading.corr_customize_data_monthly import CorrCustomizeDataMonthly
 from summary_plotting.summarydistplot import SummaryDistPlot
 
 warnings.filterwarnings("ignore")
@@ -17,17 +18,26 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
 
     data=DataLoading(
-        load_ratio=False,
+        load_ratio=True,
         range_year=range(2011,2021),
     )
 
-    corr_data=CorrCustomizeData(data,func_keyword='weightedtau')
-    corr_data.save_csv()
+    # corr_data=CorrCustomizeData(data,func_keyword='weightedtau')
+    # corr_data.save_csv()
 
-    # print(corr_data.corr_data)
+    # # print(corr_data.corr_data)
+
+    # corr_plot=SpatialCorrPlot(corr_data)
+    # corr_plot.make_plot()
+
+    corr_data=CorrCustomizeDataMonthly(data,func_keyword='pearsonr')
+    corr_data.save_csv()
 
     corr_plot=SpatialCorrPlot(corr_data)
     corr_plot.make_plot()
+    corr_plot.make_abs_plot()
+    corr_plot.make_pval_plot()
+    corr_plot.make_scatter_plot()
 
     # cluster_obj=NoCluster(data,100000)
     # plot_obj=NoPlot(cluster_obj,1)

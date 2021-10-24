@@ -40,6 +40,9 @@ class CorrCustomizeData:
                         os.makedirs(f'{self.raw_data.base_output_path}/{keyword}/{data_keyword}/')
                         print(f'\t{self.raw_data.base_output_path}/{keyword}/{data_keyword}/ not existed, create it')
 
+    def _process_corr_get_monthly(self):
+        pass;
+
     def _process_corr(self):
         result_dict=dict()
         list_type_keyword=[i for i in self.raw_data.list_type_keyword if i not in ['ALL']]
