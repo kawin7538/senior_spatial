@@ -2,6 +2,8 @@ import gc
 
 import pandas as pd
 
+import numpy as np
+
 
 class Distribution_Data:
     def __init__(self,load_ratio=True,range_year=range(2011,2021),**kwargs) -> None:
@@ -55,6 +57,11 @@ class Distribution_Data:
     def _multiply_value_one(self,df,multiplier):
         copy_df=df.copy()
         copy_df.iloc[:,range(-13,0)]*=multiplier
+        return copy_df
+
+    def _rescale_log_one(self,df):
+        copy_df=df.copy()
+        copy_df.iloc[:,range(-13,0)]=copy_df.iloc[:,range(-13,0)].transform(np.log,axis=1).replace([-np.inf],-18)
         return copy_df
 
     def get_df(self,data_keyword='case',type_keyword='DF'):

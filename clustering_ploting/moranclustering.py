@@ -142,7 +142,7 @@ class MoranLocalScatterPlot(BasePlot):
         moran_local=pickle.load(file)
         file.close()
 
-        fig, ax = plt.subplots(1,figsize=(12,12))
+        fig, ax = plt.subplots(1,figsize=(12,9))
         moran_scatterplot(moran_local,p=self.cluster.p_value,ax=ax)
         ax.set_xlabel(f"{data_keyword}_{type_keyword}")
         ax.set_ylabel(f"Spatial Lag of {data_keyword}_{type_keyword}")

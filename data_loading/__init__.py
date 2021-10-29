@@ -34,6 +34,13 @@ class DataLoading(GEOPackage,Distribution_Data):
         temp_self.list_death_minmax_value=self._get_list_minmax_value(data_keyword='death')
         return temp_self
 
+    def rescale_log(self):
+        temp_self=copy.copy(self)
+        for type_keyword in self.list_type_keyword:
+            temp_self.list_case_df[temp_self.list_type_keyword.index(type_keyword)]=temp_self._rescale_log_one(temp_self.list_case_df[temp_self.list_type_keyword.index(type_keyword)])
+            temp_self.list_death_df[temp_self.list_type_keyword.index(type_keyword)]=temp_self._rescale_log_one(temp_self.list_death_df[temp_self.list_type_keyword.index(type_keyword)])
+        return temp_self
+
     def get_map_with_data(self,data_keyword='case',type_keyword='DF'):
         assert data_keyword in ['case','death'], f"{data_keyword} not in ['case','death']"
         assert type_keyword in self.list_type_keyword, f"{type_keyword} not in {self.list_type_keyword}"

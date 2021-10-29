@@ -32,7 +32,8 @@ class CorrCustomizeDataMonthly(CorrCustomizeData):
                     temp_data2=self.raw_data.get_df(data_keyword=data_keyword,type_keyword=list_type_keyword[j]).drop(columns='total')
                     temp_data2=self._process_corr_get_monthly(temp_data2)
                     temp_data_merge=temp_data1.merge(temp_data2,on=['NAME_1','year','month'],suffixes=(f'_{list_type_keyword[i]}',f'_{list_type_keyword[j]}'))
-                    tmep_data_merge=temp_data_merge.sort_values(by=['NAME_1','year','month'])
+                    # temp_data_merge=temp_data_merge.sort_values(by=['NAME_1','year','month'])
+                    # print(temp_data_merge)
 
                     rho_df=temp_data_merge.groupby('NAME_1')[[f'value_{list_type_keyword[i]}',f'value_{list_type_keyword[j]}']].corr(
                         method=lambda x,y: self.corr_func(x,y)[0]

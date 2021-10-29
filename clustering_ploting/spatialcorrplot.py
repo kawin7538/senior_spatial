@@ -74,13 +74,15 @@ class SpatialCorrPlot:
                     g=sns.jointplot(data=temp_data_merge,x=f'value_{list_type_keyword[i]}',y=f'value_{list_type_keyword[j]}',kind='reg',joint_kws={'line_kws':{'color':'red'}})
                     # g.plot_joint(sns.kdeplot, color="r", zorder=0, levels=6)
                     # g.plot_marginals(sns.rugplot, color="r", height=-.15, clip_on=False)
-                    g.ax_joint.set_xscale('log')
-                    g.ax_joint.set_yscale('log')
+                    # g.ax_joint.set_xscale('log')
+                    # g.ax_joint.set_yscale('log')
                     g.ax_joint.set(xlabel=f"{data_keyword}_{list_type_keyword[i]}",ylabel=f"{data_keyword}_{list_type_keyword[j]}")
 
                     # plt.xlabel(f"{data_keyword}_{list_type_keyword[i]}")
                     # plt.ylabel(f"{data_keyword}_{list_type_keyword[j]}")
                     # plt.title(f"scatterplot {data_keyword} {list_type_keyword[i]}-{list_type_keyword[j]}")
+
+                    # print(f"{self.data.base_output_path}/{self.corr_data.keyword}/{data_keyword}/scatter_{list_type_keyword[i]}_{list_type_keyword[j]}")
 
                     plt.savefig(f"{self.data.base_output_path}/{self.corr_data.keyword}/{data_keyword}/scatter_{list_type_keyword[i]}_{list_type_keyword[j]}",dpi=300)
 

@@ -12,12 +12,15 @@ from data_loading import DataLoading
 
 class CorrCustomizeData:
     def __init__(self,raw_data:DataLoading, func_keyword='pearsonr'):
-        self.raw_data=raw_data
+        self.raw_data=self._rescale_data(raw_data)
         self._set_output_folder('corr')
         self.keyword='corr'
         self.func_keyword=func_keyword
         self.corr_func=self._set_corr_func(func_keyword)
         self.corr_data=self._process_corr()
+
+    def _rescale_data(self,data):
+        return data
 
     def _set_corr_func(self,func_keyword):
         func_dict={
