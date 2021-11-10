@@ -50,22 +50,34 @@ class GStarCluster(BaseCluster):
 
     def _process_local_cluster(self, local_cluster, data_keyword, type_keyword):
         for year in tqdm(self.range_year,desc=f"{self.local_keyword} {data_keyword} {type_keyword}"):
-            map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
-            y=map_with_data[map_with_data['year']==year]
+            try:
+                map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+                y=map_with_data[map_with_data['year']==year]
+                # print(y.info())
+                y['total']=y['total'].astype(float).fillna(0)
+                # print(y.info())
+                # print(y)
 
-            # self.data.set_inner_loop(77,1)
-            gistar_local=G_Local(y["total"],self.data.get_weight(),transform='B',star=True,permutations=self.permutations)
-            # self.data.set_inner_loop(77,0)
+                # self.data.set_inner_loop(77,1)
+                gistar_local=G_Local(y["total"],self.data.get_weight(),transform='B',star=True,permutations=self.permutations)
+                # self.data.set_inner_loop(77,0)
 
-            file = open(self.local_dump_model_path.format(data_keyword,type_keyword,year),'wb')
-            pickle.dump(gistar_local,file)
-            file.close()
+                file = open(self.local_dump_model_path.format(data_keyword,type_keyword,year),'wb')
+                pickle.dump(gistar_local,file)
+                file.close()
 
-            # local_cluster[data_keyword][type_keyword][year]=gistar_local
-            local_cluster[data_keyword][type_keyword][year]=self.local_dump_model_path.format(data_keyword,type_keyword,year)
+                # local_cluster[data_keyword][type_keyword][year]=gistar_local
+                local_cluster[data_keyword][type_keyword][year]=self.local_dump_model_path.format(data_keyword,type_keyword,year)
 
-            del map_with_data,y,gistar_local,file
-            gc.collect()
+                del map_with_data,y,gistar_local,file
+                gc.collect()
+
+            except Exception as e:
+                s=str(e)
+                err_file=open(f"output/log/error/_process_local_cluster_{self.data.load_ratio}_{self.local_keyword}_{data_keyword}_{type_keyword}_{year}.err",'w')
+                err_file.write(s)
+                err_file.close()
+                print(f"{self.local_keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
 
         return local_cluster
 
@@ -92,11 +104,61 @@ class GStarCluster(BaseCluster):
         spots=['not-significant','hotspot-0.01','hotspot-0.05','hotspot-0.1','coldspot-0.1','coldspot-0.05','coldspot-0.01']
         for year in tqdm(self.range_year,desc=f"sav {self.local_keyword} {data_keyword} {type_keyword}"):
 
+            try:
+
+                # gistar_local=self.local_cluster[data_keyword][type_keyword][year]
+                file=open(self.local_cluster[data_keyword][type_keyword][year],'rb')
+                gistar_local=pickle.load(file)
+                file.close()
+                
+                hotspot90=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.1)
+                hotspot95=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.05)
+                hotspot99=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.01)
+                hotspot90=hotspot90&~hotspot95
+                hotspot95=hotspot95&~hotspot99
+                notsig=(gistar_local.p_sim>0.1)
+                coldspot90=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.1)
+                coldspot95=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.05)
+                coldspot99=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.01)
+                coldspot90=coldspot90&~coldspot95
+                coldspot95=coldspot95&~coldspot99
+                hotcoldspot=hotspot99*1+hotspot95*2+hotspot90*3+coldspot90*4+coldspot95*5+coldspot99*6
+                labels=[spots[i] for i in hotcoldspot]
+
+                map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+                y=map_with_data[map_with_data['year']==year]
+                y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels)[['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+                y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels).loc[~notsig,['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+
+                del file,gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
+                gc.collect()
+
+            except Exception as e:
+                s=str(e)
+                err_file=open(f"output/log/error/_save_local_cluster_csv_{self.data.load_ratio}_{self.local_keyword}_{data_keyword}_{type_keyword}_{year}.err",'w')
+                err_file.write(s)
+                err_file.close()
+                print(f"{self.local_keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
+
+class GStarPlot(BasePlot):
+    def __init__(self, cluster: BaseCluster) -> None:
+        super(GStarPlot,self).__init__(cluster)
+        self.keyword="GStar Plot"
+        self.path="{}/gstar/{}/{}/{}.png"
+
+    def _make_local_cluster_plot(self,year,data_keyword,type_keyword,idx):
+
+        try:
+
+            fig,ax=plt.subplots(1,figsize=(9,12))
+            map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+            y=map_with_data[map_with_data['year']==year]
+
             # gistar_local=self.local_cluster[data_keyword][type_keyword][year]
-            file=open(self.local_cluster[data_keyword][type_keyword][year],'rb')
+            file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
             gistar_local=pickle.load(file)
             file.close()
-            
+
             hotspot90=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.1)
             hotspot95=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.05)
             hotspot99=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.01)
@@ -109,53 +171,22 @@ class GStarCluster(BaseCluster):
             coldspot90=coldspot90&~coldspot95
             coldspot95=coldspot95&~coldspot99
             hotcoldspot=hotspot99*1+hotspot95*2+hotspot90*3+coldspot90*4+coldspot95*5+coldspot99*6
+            spots=['not-significant','hotspot-0.01','hotspot-0.05','hotspot-0.1','coldspot-0.1','coldspot-0.05','coldspot-0.01']
             labels=[spots[i] for i in hotcoldspot]
+            color_list=['lightgrey','red',(1,0.3,0.3),(1,0.6,0.6),(0.6,0.6,1),(0.3,0.3,1),'blue'][::-1]
+            hmap=colors.ListedColormap(color_list)
+            color_labels=[color_list[::-1][i] for i in hotcoldspot]
 
-            map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
-            y=map_with_data[map_with_data['year']==year]
-            y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels)[['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
-            y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels).loc[~notsig,['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+            y.assign(cl=labels).assign(spot=hotcoldspot).plot(column='cl',categorical=True,linewidth=0.1,ax=ax,edgecolor='white',cmap=hmap,k=7,categories=spots[::-1],legend=True)
+            ax.set_axis_off()
+            plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
 
-            del file,gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
+            del gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
             gc.collect()
 
-class GStarPlot(BasePlot):
-    def __init__(self, cluster: BaseCluster) -> None:
-        super(GStarPlot,self).__init__(cluster)
-        self.keyword="GStar Plot"
-        self.path="{}/gstar/{}/{}/{}.png"
-
-    def _make_local_cluster_plot(self,year,data_keyword,type_keyword,idx):
-        fig,ax=plt.subplots(1,figsize=(9,12))
-        map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
-        y=map_with_data[map_with_data['year']==year]
-
-        # gistar_local=self.local_cluster[data_keyword][type_keyword][year]
-        file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
-        gistar_local=pickle.load(file)
-        file.close()
-
-        hotspot90=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.1)
-        hotspot95=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.05)
-        hotspot99=(gistar_local.Zs>0)&(gistar_local.p_sim<=0.01)
-        hotspot90=hotspot90&~hotspot95
-        hotspot95=hotspot95&~hotspot99
-        notsig=(gistar_local.p_sim>0.1)
-        coldspot90=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.1)
-        coldspot95=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.05)
-        coldspot99=(gistar_local.Zs<0)&(gistar_local.p_sim<=0.01)
-        coldspot90=coldspot90&~coldspot95
-        coldspot95=coldspot95&~coldspot99
-        hotcoldspot=hotspot99*1+hotspot95*2+hotspot90*3+coldspot90*4+coldspot95*5+coldspot99*6
-        spots=['not-significant','hotspot-0.01','hotspot-0.05','hotspot-0.1','coldspot-0.1','coldspot-0.05','coldspot-0.01']
-        labels=[spots[i] for i in hotcoldspot]
-        color_list=['lightgrey','red',(1,0.3,0.3),(1,0.6,0.6),(0.6,0.6,1),(0.3,0.3,1),'blue'][::-1]
-        hmap=colors.ListedColormap(color_list)
-        color_labels=[color_list[::-1][i] for i in hotcoldspot]
-
-        y.assign(cl=labels).assign(spot=hotcoldspot).plot(column='cl',categorical=True,linewidth=0.1,ax=ax,edgecolor='white',cmap=hmap,k=7,categories=spots[::-1],legend=True)
-        ax.set_axis_off()
-        plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
-
-        del gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
-        gc.collect()
+        except Exception as e:
+            s=str(e)
+            err_file=open(f"output/log/error/_make_local_cluster_plot_{self.data.load_ratio}_{self.keyword}_{data_keyword}_{type_keyword}_{year}.err",'w')
+            err_file.write(s)
+            err_file.close()
+            print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")

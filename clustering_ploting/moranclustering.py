@@ -135,14 +135,22 @@ class MoranLocalScatterPlot(BasePlot):
         self.path="{}/moran/{}/{}/MoranScatter_{}.png"
 
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
-        map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
-        y=map_with_data[map_with_data['year']==year].fillna(0)
+        try:
+            map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+            y=map_with_data[map_with_data['year']==year].fillna(0)
 
-        file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
-        moran_local=pickle.load(file)
-        file.close()
+            file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
+            moran_local=pickle.load(file)
+            file.close()
 
-        fig, ax = plt.subplots(1,figsize=(12,9))
-        moran_scatterplot(moran_local,p=self.cluster.p_value,ax=ax)
-        ax.set_xlabel(f"{data_keyword}_{type_keyword}")
-        ax.set_ylabel(f"Spatial Lag of {data_keyword}_{type_keyword}")
+            fig, ax = plt.subplots(1,figsize=(12,9))
+            moran_scatterplot(moran_local,p=self.cluster.p_value,ax=ax)
+            ax.set_xlabel(f"{data_keyword}_{type_keyword}")
+            ax.set_ylabel(f"Spatial Lag of {data_keyword}_{type_keyword}")
+
+        except Exception as e:
+            s=str(e)
+            err_file=open(f"output/log/error/_process_local_cluster_{self.data.load_ratio}_{self.keyword}_{data_keyword}_{type_keyword}_{year}.err",'w')
+            err_file.write(s)
+            err_file.close()
+            print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")

@@ -7,3 +7,5 @@
 *.zip
 *.json
 .dump_model/*
+*.log
+*.err
