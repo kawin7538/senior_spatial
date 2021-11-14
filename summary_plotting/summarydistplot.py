@@ -12,7 +12,7 @@ class SummaryDistPlot:
         self.list_type_keyword=self.plot_obj.data.list_type_keyword
         self.range_year=self.plot_obj.data.range_year
 
-    def save_png(self):
+    def save_png_all(self):
         for data_keyword in ['case','death']:
             list_image=[]
             for type_keyword in self.list_type_keyword:
@@ -35,3 +35,24 @@ class SummaryDistPlot:
             # del list_image, final_image
             del list_image
             gc.collect()
+
+    def save_png_split(self):
+        for data_keyword in ['case','death']:
+            for type_keyword in self.list_type_keyword:
+                self._save_png_split_one(data_keyword=data_keyword,type_keyword=type_keyword,range_year=self.range_year)
+
+    def _save_png_split_one(self,data_keyword,type_keyword,range_year):
+        temp_list_image=[]
+        for year in range_year:
+            temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
+        temp_img1=np.concatenate(temp_list_image[0:5],axis=1)
+        temp_img2=np.concatenate(temp_list_image[5:],axis=1)
+        del temp_list_image
+        gc.collect()
+        img=np.concatenate((temp_img1,temp_img2),axis=0)
+        print(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year))
+        temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
+        temp_path="/".join(temp_path.split('/')[:5])
+        cv2.imwrite(f"{temp_path}/summary.png",img)
+        del img
+        gc.collect()

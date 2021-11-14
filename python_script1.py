@@ -28,7 +28,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    load_ratio=True
+    load_ratio=False
 
     print("Program Started with load_ratio =",load_ratio)
 
@@ -65,40 +65,40 @@ if __name__ == '__main__':
     # corr_plot.make_pval_plot()
     # corr_plot.make_scatter_plot()
 
-    # cluster_obj=NoCluster(data,100000)
-    # plot_obj=NoPlot(cluster_obj,1)
+    cluster_obj=NoCluster(data,100000)
+    plot_obj=NoPlot(cluster_obj,1)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
+
+    SummaryDistPlot(plot_obj).save_png_split()
+
+    del cluster_obj,plot_obj
+    gc.collect()
+
+    # cluster_obj=GStarCluster(data,100000)
+    # cluster_obj.save_global_cluster_csv()
+    # cluster_obj.save_local_cluster_csv()
+    # plot_obj=GStarPlot(cluster_obj)
     # # plot_obj.plot_preview()
     # plot_obj.save_local_cluster_plot_png()
-
-    # # SummaryDistPlot(plot_obj).save_png()
 
     # del cluster_obj,plot_obj
     # gc.collect()
 
-    cluster_obj=GStarCluster(data,100000)
-    cluster_obj.save_global_cluster_csv()
-    cluster_obj.save_local_cluster_csv()
-    plot_obj=GStarPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
+    # cluster_obj=MoranCluster(data,100000,p_value=0.05)
+    # cluster_obj.save_global_cluster_csv()
+    # cluster_obj.save_local_cluster_csv()
+    # plot_obj=LISAPlot(cluster_obj)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
+    # plot_obj=MoranLocalScatterPlot(cluster_obj)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
 
-    del cluster_obj,plot_obj
-    gc.collect()
+    # del cluster_obj,plot_obj
+    # gc.collect()
 
-    cluster_obj=MoranCluster(data,100000,p_value=0.05)
-    cluster_obj.save_global_cluster_csv()
-    cluster_obj.save_local_cluster_csv()
-    plot_obj=LISAPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
-    plot_obj=MoranLocalScatterPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
+    # sys.stderr = original_stderr
+    # sys.stdout = original_stdout
 
-    del cluster_obj,plot_obj
-    gc.collect()
-
-    sys.stderr = original_stderr
-    sys.stdout = original_stdout
-
-    fh.close()
+    # fh.close()
