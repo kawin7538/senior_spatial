@@ -43,7 +43,7 @@ class SummaryDistPlot:
 
     def _save_png_split_one(self,data_keyword,type_keyword,range_year):
         temp_list_image=[]
-        for year in range_year:
+        for year in tqdm(range_year,desc=f"Process Summarize {data_keyword} {type_keyword}"):
             temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
         temp_img1=np.concatenate(temp_list_image[0:5],axis=1)
         temp_img2=np.concatenate(temp_list_image[5:],axis=1)
