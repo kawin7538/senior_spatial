@@ -1,8 +1,10 @@
+import copy
 import cv2
 from tqdm import tqdm
 import gc
 import numpy as np
 from clustering_ploting.base import BaseCluster, BasePlot
+from PIL import Image, ImageFont, ImageDraw
 
 
 class SummaryDistPlot:
@@ -56,3 +58,70 @@ class SummaryDistPlot:
         cv2.imwrite(f"{temp_path}/summary.png",img)
         del img
         gc.collect()
+
+    def _create_vert_label(self,img_arr,img_width,text,font):
+        
+        copy_img_arr=copy.deepcopy(img_arr)
+
+        img=Image.new("RGB",(img_width,1000),(255,255,255))
+        draw=ImageDraw.Draw(img)
+        draw.text((1200,250),text=text,font=font,fill=(0,0,0))
+        img=img.rotate(90,expand=1)
+        img=np.array(img)
+
+        copy_img_arr.append(img)
+
+        del img
+        gc.collect()
+
+        return copy_img_arr
+
+    def save_png_horizontal(self):
+        # 2700 * 3600 each
+        font = ImageFont.truetype("fonts/times.ttf", 512)
+
+        for data_keyword in tqdm(['case','death'],desc="summary png horizontal"):
+
+            img_arr=img_arr2=img_arr3=year_img_arr=[]
+
+            img_arr=self._create_vert_label(img_arr,3600,"DF",font)
+            img_arr2=self._create_vert_label(img_arr2,3600,"DHF",font)
+            img_arr3=self._create_vert_label(img_arr3,3600,"DSS",font)
+
+            img=np.array(Image.new("RGB",(1000,1000),(255,255,255)))
+            year_img_arr.append(img)
+            del img
+
+            for year in range(2011,2021):
+                img=Image.new("RGB",(2700,1000),(255,255,255))
+                draw=ImageDraw.Draw(img)
+                draw.text((900,250),text=str(year),font=font,fill=(0,0,0))
+                img=np.array(img)
+                year_img_arr.append(img)
+                del img
+                
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DF/{year}.png")
+                img_arr.append(img)
+                del img
+
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DHF/{year}.png")
+                img_arr2.append(img)
+                del img
+
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DSS/{year}.png")
+                img_arr3.append(img)
+
+                del img
+
+            img_yearly=np.concatenate(year_img_arr,axis=1)
+            img_df=np.concatenate(img_arr,axis=1)
+            img_dhf=np.concatenate(img_arr2,axis=1)
+            img_dss=np.concatenate(img_arr3,axis=1)
+
+            print(img_yearly.shape,img_df.shape,img_dhf.shape,img_dss.shape)
+
+            img_final=np.concatenate([img_yearly,img_df,img_dhf,img_dss],axis=0)
+            cv2.imwrite(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/three_disease_horz.png",img_final)
+
+            del img_df, img_dhf, img_dss, img_final, img_arr, img_arr2, img_arr3
+            gc.collect()

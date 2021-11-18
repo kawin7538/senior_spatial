@@ -67,10 +67,10 @@ if __name__ == '__main__':
 
     cluster_obj=NoCluster(data,100000)
     plot_obj=NoPlot(cluster_obj,1)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
+    # plot_obj.plot_preview(bbox_inches=None)
+    # plot_obj.save_local_cluster_plot_png(bbox_inches=None)
 
-    SummaryDistPlot(plot_obj).save_png_split()
+    SummaryDistPlot(plot_obj).save_png_horizontal()
 
     del cluster_obj,plot_obj
     gc.collect()

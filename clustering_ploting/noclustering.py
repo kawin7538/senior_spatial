@@ -28,5 +28,5 @@ class NoPlot(BasePlot):
         if data_keyword=='death':
             y.plot(column='total',legend=True,ax=ax,cmap='Oranges',edgecolor=(0,0,0,0.8),norm=colors.PowerNorm(self.gamma,vmin=self.list_death_minmax_value[idx][0],vmax=self.list_death_minmax_value[idx][1]))
         ax.set_axis_off()
-        plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+        # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
         # return fig,ax
