@@ -97,7 +97,10 @@ class SummaryDistPlot:
 
         for data_keyword in tqdm(['case','death'],desc="summary png horizontal"):
 
-            self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword)
+            if data_keyword=='case':
+                self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword)
+            else:
+                self._create_custom_legend(self.plot_obj.data.death_max_value,data_keyword)
 
             img_arr=img_arr2=img_arr3=year_img_arr=[]
 
