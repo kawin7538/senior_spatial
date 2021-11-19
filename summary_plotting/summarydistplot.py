@@ -5,6 +5,8 @@ import gc
 import numpy as np
 from clustering_ploting.base import BaseCluster, BasePlot
 from PIL import Image, ImageFont, ImageDraw
+import matplotlib.pyplot as plt
+from matplotlib import colors
 
 
 class SummaryDistPlot:
@@ -76,26 +78,48 @@ class SummaryDistPlot:
 
         return copy_img_arr
 
+    def _create_custom_legend(self,max_value,keyword):
+        f,ax=plt.subplots(1,figsize=(9,12))
+        ax.remove()
+        cax = f.add_axes([0.2, 0.08, 0.5, 0.005]) #[left, bottom, width, height]
+        sm = plt.cm.ScalarMappable(cmap='Oranges', norm=colors.PowerNorm(1,vmin=0,vmax=max_value))
+        # fake up the array of the scalar mappable.
+        sm._A = []
+        lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, y=1.05, labelpad=0)
+        # plt.xticks(rotation=30)
+        plt.savefig('{}/label.png'.format(f"output/raw/distribution/{keyword}"),dpi=2400,bbox_inches='tight')
+
+        plt.close('all')
+
     def save_png_horizontal(self):
-        # 2700 * 3600 each
+        # 1568 * 2832 each
         font = ImageFont.truetype("fonts/times.ttf", 512)
 
         for data_keyword in tqdm(['case','death'],desc="summary png horizontal"):
 
+            self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword)
+
             img_arr=img_arr2=img_arr3=year_img_arr=[]
 
-            img_arr=self._create_vert_label(img_arr,3600,"DF",font)
-            img_arr2=self._create_vert_label(img_arr2,3600,"DHF",font)
-            img_arr3=self._create_vert_label(img_arr3,3600,"DSS",font)
+            img_arr=self._create_vert_label(img_arr,2832,"DF",font)
+            img_arr2=self._create_vert_label(img_arr2,2832,"DHF",font)
+            img_arr3=self._create_vert_label(img_arr3,2832,"DSS",font)
 
             img=np.array(Image.new("RGB",(1000,1000),(255,255,255)))
             year_img_arr.append(img)
             del img
 
+            legend_img=Image.open('{}/label.png'.format(f"output/raw/distribution/{data_keyword}"))
+            legend_new_size=(16680,int(1503/11386*16680))
+            legend_img=legend_img.resize(legend_new_size)
+            legend_img=legend_img.convert("RGB")
+            legend_img=np.array(legend_img)
+            legend_img=legend_img[:,:,::-1]
+
             for year in range(2011,2021):
-                img=Image.new("RGB",(2700,1000),(255,255,255))
+                img=Image.new("RGB",(1568,1000),(255,255,255))
                 draw=ImageDraw.Draw(img)
-                draw.text((900,250),text=str(year),font=font,fill=(0,0,0))
+                draw.text((400,250),text=str(year),font=font,fill=(0,0,0))
                 img=np.array(img)
                 year_img_arr.append(img)
                 del img
@@ -118,10 +142,10 @@ class SummaryDistPlot:
             img_dhf=np.concatenate(img_arr2,axis=1)
             img_dss=np.concatenate(img_arr3,axis=1)
 
-            print(img_yearly.shape,img_df.shape,img_dhf.shape,img_dss.shape)
+            print(img_yearly.shape,img_df.shape,img_dhf.shape,img_dss.shape,legend_img.shape)
 
-            img_final=np.concatenate([img_yearly,img_df,img_dhf,img_dss],axis=0)
+            img_final=np.concatenate([img_yearly,img_df,img_dhf,img_dss,legend_img],axis=0)
             cv2.imwrite(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/three_disease_horz.png",img_final)
 
-            del img_df, img_dhf, img_dss, img_final, img_arr, img_arr2, img_arr3
+            del img_df, img_dhf, img_dss, img_final, img_arr, img_arr2, img_arr3, legend_img
             gc.collect()

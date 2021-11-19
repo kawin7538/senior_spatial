@@ -12,8 +12,10 @@ class DataLoading(GEOPackage,Distribution_Data):
         super(DataLoading,self).__init__(load_ratio=load_ratio,range_year=range_year)
         self.list_case_map=self._merge(self.list_case_df)
         self.list_case_minmax_value=self._get_list_minmax_value(data_keyword='case')
+        self.case_max_value=max([i[1] for i in self.list_case_minmax_value[:-1]])
         self.list_death_map=self._merge(self.list_death_df)
         self.list_death_minmax_value=self._get_list_minmax_value(data_keyword='death')
+        self.death_max_value=max([i[1] for i in self.list_death_minmax_value[:-1]])
         print("Data Loaded")
 
     def _merge(self,list_df):

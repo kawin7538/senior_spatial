@@ -37,6 +37,11 @@ if __name__ == '__main__':
         range_year=range(2011,2021),
     )
 
+    print(data.list_case_minmax_value)
+    print(data.case_max_value)
+    print(data.list_death_minmax_value)
+    print(data.death_max_value)
+
     # corr_data=CorrCustomizeData(data,func_keyword='pearsonr')
     # corr_data.save_csv()
 
@@ -67,8 +72,8 @@ if __name__ == '__main__':
 
     cluster_obj=NoCluster(data,100000)
     plot_obj=NoPlot(cluster_obj,1)
-    # plot_obj.plot_preview(bbox_inches=None)
-    # plot_obj.save_local_cluster_plot_png(bbox_inches=None)
+    # plot_obj.plot_preview(bbox_inches='tight')
+    # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
 
     SummaryDistPlot(plot_obj).save_png_horizontal()
 
