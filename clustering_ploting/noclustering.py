@@ -28,9 +28,9 @@ class NoPlot(BasePlot):
         # if data_keyword=='death':
         #     y.plot(column='total',legend=True,ax=ax,cmap='Oranges',edgecolor=(0,0,0,0.8),norm=colors.PowerNorm(self.gamma,vmin=self.list_death_minmax_value[idx][0],vmax=self.list_death_minmax_value[idx][1]))
         if data_keyword=='case':
-            y.plot(column='total',legend=False,ax=ax,cmap='Oranges',edgecolor=(0,0,0,0.8),norm=colors.PowerNorm(self.gamma,vmin=0,vmax=self.data.case_max_value))
+            y.plot(column='total',legend=False,ax=ax,cmap='Oranges',edgecolor=(0,0,0,1),linewidth=2,norm=colors.PowerNorm(self.gamma[0],vmin=0,vmax=self.data.case_max_value))
         if data_keyword=='death':
-            y.plot(column='total',legend=False,ax=ax,cmap='Oranges',edgecolor=(0,0,0,0.8),norm=colors.PowerNorm(self.gamma,vmin=0,vmax=self.data.death_max_value))
+            y.plot(column='total',legend=False,ax=ax,cmap='Oranges',edgecolor=(0,0,0,1),linewidth=2,norm=colors.PowerNorm(self.gamma[1],vmin=0,vmax=self.data.death_max_value))
         ax.set_axis_off()
         # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
         # return fig,ax

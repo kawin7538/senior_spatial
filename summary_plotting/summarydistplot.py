@@ -78,29 +78,31 @@ class SummaryDistPlot:
 
         return copy_img_arr
 
-    def _create_custom_legend(self,max_value,keyword):
+    def _create_custom_legend(self,max_value,keyword,gamma):
         f,ax=plt.subplots(1,figsize=(9,12))
         ax.remove()
-        cax = f.add_axes([0.2, 0.08, 0.5, 0.005]) #[left, bottom, width, height]
-        sm = plt.cm.ScalarMappable(cmap='Oranges', norm=colors.PowerNorm(1,vmin=0,vmax=max_value))
+        cax = f.add_axes([0.2, 0.08, 1, 0.01]) #[left, bottom, width, height]
+        sm = plt.cm.ScalarMappable(cmap='Oranges', norm=colors.PowerNorm(gamma,vmin=0,vmax=max_value))
         # fake up the array of the scalar mappable.
         sm._A = []
         lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, y=1.05, labelpad=0)
-        # plt.xticks(rotation=30)
+        # lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, labelpad=0.5)
+        # lgd=f.colorbar(sm, cax=cax,orientation="horizontal")
+        plt.xticks(rotation=30)
         plt.savefig('{}/label.png'.format(f"output/raw/distribution/{keyword}"),dpi=2400,bbox_inches='tight')
 
         plt.close('all')
 
     def save_png_horizontal(self):
         # 1568 * 2832 each
-        font = ImageFont.truetype("fonts/times.ttf", 512)
+        font = ImageFont.truetype("fonts/times.ttf", 256)
 
         for data_keyword in tqdm(['case','death'],desc="summary png horizontal"):
 
             if data_keyword=='case':
-                self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword)
+                self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword,self.plot_obj.gamma[0])
             else:
-                self._create_custom_legend(self.plot_obj.data.death_max_value,data_keyword)
+                self._create_custom_legend(self.plot_obj.data.death_max_value,data_keyword,self.plot_obj.gamma[1])
 
             img_arr=img_arr2=img_arr3=year_img_arr=[]
 
@@ -113,7 +115,8 @@ class SummaryDistPlot:
             del img
 
             legend_img=Image.open('{}/label.png'.format(f"output/raw/distribution/{data_keyword}"))
-            legend_new_size=(16680,int(1503/11386*16680))
+            print(legend_img.size)
+            legend_new_size=(16680,int(legend_img.size[1]/legend_img.size[0]*16680))
             legend_img=legend_img.resize(legend_new_size)
             legend_img=legend_img.convert("RGB")
             legend_img=np.array(legend_img)
