@@ -85,11 +85,14 @@ class SummaryDistPlot:
         sm = plt.cm.ScalarMappable(cmap='Oranges', norm=colors.PowerNorm(gamma,vmin=0,vmax=max_value))
         # fake up the array of the scalar mappable.
         sm._A = []
-        lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, y=1.05, labelpad=0)
+        if self.plot_obj.data.load_ratio:
+            lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Proportion of {keyword} per 100,000", rotation=0, y=1.05, labelpad=0)
+        else:
+            lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, y=1.05, labelpad=0)
         # lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, labelpad=0.5)
         # lgd=f.colorbar(sm, cax=cax,orientation="horizontal")
         plt.xticks(rotation=30)
-        plt.savefig('{}/label.png'.format(f"output/raw/distribution/{keyword}"),dpi=2400,bbox_inches='tight')
+        plt.savefig('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/distribution/{keyword}"),dpi=2400,bbox_inches='tight')
 
         plt.close('all')
 
@@ -114,7 +117,7 @@ class SummaryDistPlot:
             year_img_arr.append(img)
             del img
 
-            legend_img=Image.open('{}/label.png'.format(f"output/raw/distribution/{data_keyword}"))
+            legend_img=Image.open('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}"))
             print(legend_img.size)
             legend_new_size=(16680,int(legend_img.size[1]/legend_img.size[0]*16680))
             legend_img=legend_img.resize(legend_new_size)

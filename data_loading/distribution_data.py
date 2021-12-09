@@ -78,7 +78,7 @@ class Distribution_Data:
 
 if __name__ == '__main__':
     data=Distribution_Data()
-    print(data.get_df())
-    data.multiply_value(100000)
-    print(data.get_df())
-    print([i for i in range(-12,0)])
+    # print(data.get_df())
+    # data.multiply_value(100000)
+    # print(data.get_df())
+    # print([i for i in range(-12,0)])

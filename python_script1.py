@@ -28,7 +28,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    load_ratio=False
+    load_ratio=True
 
     print("Program Started with load_ratio =",load_ratio)
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # corr_plot.make_scatter_plot()
 
     cluster_obj=NoCluster(data,100000)
-    plot_obj=NoPlot(cluster_obj,(0.4,0.4))
+    plot_obj=NoPlot(cluster_obj,(0.5,0.3))
     # plot_obj.plot_preview(bbox_inches='tight')
     plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
 

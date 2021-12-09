@@ -44,9 +44,11 @@ class BaseCluster:
             self.data.list_death_map[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_death_map[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
             self.data.list_case_df[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_case_df[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
             self.data.list_death_df[self.data.list_type_keyword.index(type_keyword)]=self.data._multiply_value_one(self.data.list_death_df[self.data.list_type_keyword.index(type_keyword)],self.multiplier)
-        
+
         self.data.list_case_minmax_value=self.data._get_list_minmax_value(data_keyword='case')
         self.data.list_death_minmax_value=self.data._get_list_minmax_value(data_keyword='death')
+        self.data.case_max_value=max([i[1] for i in self.data.list_case_minmax_value[:-1]])
+        self.data.death_max_value=max([i[1] for i in self.data.list_death_minmax_value[:-1]])
         # return self.data
 
     def process_global_cluster(self):
