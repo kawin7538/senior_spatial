@@ -1,12 +1,14 @@
 from datetime import datetime
 import sys
-dateTimeObj = datetime.now()
-timestampStr = dateTimeObj.strftime("%Y%m%d_%H%M%S%f")
-fh = open(f'output/log/log_{timestampStr}.log', 'w')
-original_stderr = sys.stderr
-sys.stderr = fh
-original_stdout = sys.stdout
-sys.stdout = fh
+
+from clustering_ploting.populationplot import PopulationPlot
+# dateTimeObj = datetime.now()
+# timestampStr = dateTimeObj.strftime("%Y%m%d_%H%M%S%f")
+# fh = open(f'output/log/log_{timestampStr}.log', 'w')
+# original_stderr = sys.stderr
+# sys.stderr = fh
+# original_stdout = sys.stdout
+# sys.stdout = fh
 
 import gc
 import warnings
@@ -37,10 +39,7 @@ if __name__ == '__main__':
         range_year=range(2011,2021),
     )
 
-    print(data.list_case_minmax_value)
-    print(data.case_max_value)
-    print(data.list_death_minmax_value)
-    print(data.death_max_value)
+    PopulationPlot(data).summary_plot(0.6)
 
     # corr_data=CorrCustomizeData(data,func_keyword='pearsonr')
     # corr_data.save_csv()
@@ -70,15 +69,15 @@ if __name__ == '__main__':
     # corr_plot.make_pval_plot()
     # corr_plot.make_scatter_plot()
 
-    cluster_obj=NoCluster(data,100000)
-    plot_obj=NoPlot(cluster_obj,(0.5,0.3))
-    # plot_obj.plot_preview(bbox_inches='tight')
-    plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
+    # cluster_obj=NoCluster(data,100000)
+    # plot_obj=NoPlot(cluster_obj,(0.5,0.3))
+    # # plot_obj.plot_preview(bbox_inches='tight')
+    # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
 
-    SummaryDistPlot(plot_obj).save_png_horizontal()
+    # SummaryDistPlot(plot_obj).save_png_horizontal()
 
-    del cluster_obj,plot_obj
-    gc.collect()
+    # del cluster_obj,plot_obj
+    # gc.collect()
 
     # cluster_obj=GStarCluster(data,100000)
     # cluster_obj.save_global_cluster_csv()

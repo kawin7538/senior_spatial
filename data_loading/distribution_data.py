@@ -23,6 +23,7 @@ class Distribution_Data:
         # self.list_case_minmax_value=self._get_list_minmax_value(data_keyword='case')
         self.list_death_df=self._custom_edit_data(self._read_csv_list(data_keyword='death'))
         # self.list_death_minmax_value=self._get_list_minmax_value(data_keyword='death')
+        self.pop10year=self._custom_edit_data([pd.read_csv("preprocessed_data/pop_10year.csv")])[0]
         print("\tDistribution Data Loaded---")
 
     def _config_base_output_path(self,load_ratio):
@@ -48,10 +49,17 @@ class Distribution_Data:
 
     def _custom_edit_data(self,list_df):
         for df in list_df:
-            df.loc[df['area']=='Bangkok','area']='Bangkok Metropolis'
-            df.loc[df['area']=='Bungkan','area']='Bueng Kan'
-            df.loc[df['area']=='P.Nakhon S.Ayutthaya','area']='Phra Nakhon Si Ayutthaya'
-            df.rename(columns={'area':'NAME_1'},inplace=True)
+            try:
+                df.loc[df['area']=='Bangkok','area']='Bangkok Metropolis'
+                df.loc[df['area']=='Bungkan','area']='Bueng Kan'
+                df.loc[df['area']=='P.Nakhon S.Ayutthaya','area']='Phra Nakhon Si Ayutthaya'
+                df.rename(columns={'area':'NAME_1'},inplace=True)
+            except:
+                print("DF did not have area, use Provinces instead")
+                df.loc[df['Provinces']=='Bangkok','Provinces']='Bangkok Metropolis'
+                df.loc[df['Provinces']=='Bungkan','Provinces']='Bueng Kan'
+                df.loc[df['Provinces']=='P.Nakhon S.Ayutthaya','Provinces']='Phra Nakhon Si Ayutthaya'
+                df.rename(columns={'Provinces':'NAME_1'},inplace=True)
         return list_df
 
     def _multiply_value_one(self,df,multiplier):
