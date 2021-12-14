@@ -1,0 +1,40 @@
+*********************************
+
+Description for TestCase
+
+*********************************
+
+Structure of .in files
+
+    - Each .in file consists of 2 line. 
+        - First line contains four parameters as follow: layer depth for preparing data, layer depth for filter, filter property (name, etc.), and percent adjust (0-100) that defined for random interval.
+        - Second line consists of n classified values for n nodes in map, input as "high" and "low".
+
+Description in each .in files
+    
+    - 1-2.in
+    Prachuap Khiri Khan, segregated pattern.
+
+    - 3-4.in
+    Prachuap Khiri Khan, grouped pattern.
+
+    - 5-7.in
+    Prachuap Khiri Khan, drumbell shape, heavy-outside.
+
+    - 8-10.in
+    Prachuap Khiri Khan, drumbell shape, heavy-inside.
+
+    - 11-13.in
+    Phuket, low-value-dominant.
+
+    - 14-16.in
+    Phuket, high-value-dominant.
+
+    - 17.in
+    Pathum Thani, complete segregated
+
+    - 18-19.in
+    Nakhon Pathom, centered-grouping
+
+    - 20-21.in
+    Satun, linear separation

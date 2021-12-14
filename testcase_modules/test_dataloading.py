@@ -17,10 +17,12 @@ class TestDataLoading:
     def _generate_value(self,list_value):
         ans_list=[]
         for word in list_value:
-            assert word in ["high",'low'], "word should be low,mid,high"
+            assert word in ["high","mid",'low'], "word should be low,mid,high"
             temp_value=np.random.uniform(0.5-((1-self.percent_adjust/100)*0.5),0.5+((1-self.percent_adjust/100)*0.5),1)[0]
             if word=="high":
                 ans_list.append(temp_value*10000)
+            elif word=="mid":
+                ans_list.append(temp_value*5005)
             elif word=="low":
                 ans_list.append(temp_value*10)
         return ans_list
