@@ -19,6 +19,7 @@ class TestDataLoading:
         for word in list_value:
             assert word in ["high","mid",'low'], "word should be low,mid,high"
             temp_value=np.random.uniform(0.5-((1-self.percent_adjust/100)*0.5),0.5+((1-self.percent_adjust/100)*0.5),1)[0]
+            # temp_value=0.5
             if word=="high":
                 ans_list.append(temp_value*10000)
             elif word=="mid":

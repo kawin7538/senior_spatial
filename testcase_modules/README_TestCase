@@ -4,6 +4,9 @@ Description for TestCase
 
 *********************************
 
+Iteration through value precise
+    - all the inputs will be iterately with precise value from 100, 99, 95, 90, 75, 50 percent
+
 Structure of .in files
 
     - Each .in file consists of 2 line. 
