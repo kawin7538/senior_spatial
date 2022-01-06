@@ -39,6 +39,7 @@ class TestPlayCase:
                 dataloading_obj.to_csv(os.path.join("output/testcase_output",file_name.split('.')[0]+f"_precision{precision}"+".csv"))
 
                 file_name=file_name.split('.')[0]+f"_precision{precision}"
+                self._plot_map_with_name(dataloading_obj,file_name,num_layer)
                 self._plot_weight(geopackage_obj,file_name)
                 self._plot_dist(dataloading_obj,file_name)
                 self._plot_local_gi(dataloading_obj,geopackage_obj,file_name)
@@ -48,6 +49,8 @@ class TestPlayCase:
 
                 del input_value, num_layer, selected_layer, selected_name,geopackage_obj, dataloading_obj
                 gc.collect()
+                break;
+            break;
 
     def _read_file(self, dir_path, file_name):
         with open(os.path.join(dir_path,file_name),"r") as file:
@@ -56,6 +59,19 @@ class TestPlayCase:
                 temp_ans[i]=temp_ans[i].replace('\n','').split(',')
                 temp_ans[i]=[int(item) if item.isdigit() else item for item in temp_ans[i] ]
             return temp_ans
+
+    def _plot_map_with_name(self,dataloading_obj:TestDataLoading,file_name,num_layer):
+        fig,ax=plt.subplots(1,figsize=(12,12))
+        temp_map_with_data=dataloading_obj.map_with_data.copy()
+        # print(temp_map_with_data)
+        # print(temp_map_with_data.columns)
+        # print(temp_map_with_data[f'NAME_{num_layer}'])
+        temp_map_with_data.apply(lambda x: ax.annotate(s=x[f'NAME_{num_layer}'], xy=x.geometry.centroid.coords[0], ha='center', fontsize=20),axis=1);
+        temp_map_with_data.boundary.plot(ax=ax, color='Black', linewidth=.4)
+        temp_map_with_data.plot(ax=ax, cmap='Pastel2')
+        ax.set_axis_off()
+        plt.savefig(os.path.join("output/testcase_output",file_name.split('.')[0]+".name.png"),dpi=300,bbox_inches='tight')
+        plt.close('all')
 
     def _plot_weight(self,geopackage_obj:TestGEOPackage,file_name):
         fig,ax=plt.subplots(1,figsize=(12,12))
@@ -159,7 +175,7 @@ class TestPlayCase:
 
         try:
             fig,ax=plt.subplots(1,figsize=(12,12))
-            moran_scatterplot(moran_local,p=0.1,ax=ax)
+            moran_scatterplot(moran_local,p=0.1,ax=ax,scatter_kwds={'s':500})
             ax.set_axis_off()
             plt.savefig(os.path.join("output/testcase_output",file_name.split('.')[0]+".moran.scatter.png"),dpi=300,bbox_inches='tight')
             plt.close('all')
