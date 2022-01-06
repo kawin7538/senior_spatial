@@ -1,0 +1,105 @@
+<!DOCTYPE=html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <title>
+        Detail for #{{testcase}} with precision{{precision}}
+    </title>
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron bg-light sticky-top">
+          <h1 class="display-4">Detail for #{{testcase}}</h1>
+          <p class="lead">with precision {{precision}}</p>
+        </div>
+        <!-- Distribution View -->
+        <div class="card">
+            <div class="row g-0">
+              <div class="col-md-3">
+                <img src="../../{{testcase}}_precision{{precision}}.dist.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h3 class="card-title">Distribution</h3>
+                  <div class="card-text">{{dist_table|safe}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Getis Ord -->
+          <div class="card">
+            <div class="row g-0">
+              <div class="col-md-3">
+                <img src="../../{{testcase}}_precision{{precision}}.gi.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h3 class="card-title">Getis Ord</h3>
+                  <p class="card-text">Global</p>
+                  <div class="card-text">{{g_global_table|safe}}</div>
+                  <hr>
+                  <p class="card-text">Local</p>
+                  <div class="card-text">{{gi_table|safe}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Getis Ord GiStar-->
+          <div class="card">
+            <div class="row g-0">
+              <div class="col-md-3">
+                <img src="../../{{testcase}}_precision{{precision}}.gistar.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h3 class="card-title">Getis Ord GiStar</h3>
+                  <p class="card-text">Global</p>
+                  <div class="card-text">{{g_global_table|safe}}</div>
+                  <hr>
+                  <p class="card-text">Local</p>
+                  <div class="card-text">{{gistar_table|safe}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Local Moran I-->
+          <div class="card">
+            <div class="row g-0">
+              <div class="col-md-3">
+                <img src="../../{{testcase}}_precision{{precision}}.lisa.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+                <img src="../../{{testcase}}_precision{{precision}}.moran.scatter.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h3 class="card-title">Moran's I coefficient</h3>
+                  <p class="card-text">Global</p>
+                  <div class="card-text">{{moran_global_table|safe}}</div>
+                  <hr>
+                  <p class="card-text">Local</p>
+                  <div class="card-text">{{lisa_table|safe}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Geary C-->
+          <div class="card">
+            <div class="row g-0">
+              <div class="col-md-3">
+                <img src="../../{{testcase}}_precision{{precision}}.c.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h3 class="card-title">Geary's C</h3>
+                  <p class="card-text">Global</p>
+                  <div class="card-text">{{c_global_table|safe}}</div>
+                  <hr>
+                  <p class="card-text">Local</p>
+                  <div class="card-text">{{c_local_table|safe}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</body>
+</html>
