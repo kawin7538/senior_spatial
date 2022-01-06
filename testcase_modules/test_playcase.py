@@ -49,8 +49,8 @@ class TestPlayCase:
 
                 del input_value, num_layer, selected_layer, selected_name,geopackage_obj, dataloading_obj
                 gc.collect()
-                break;
-            break;
+                # break;
+            # break;
 
     def _read_file(self, dir_path, file_name):
         with open(os.path.join(dir_path,file_name),"r") as file:
