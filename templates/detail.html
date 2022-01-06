@@ -9,97 +9,107 @@
 </head>
 <body>
     <div class="container">
-        <div class="jumbotron bg-light sticky-top">
+        <div class="jumbotron text-center bg-light sticky-top">
           <h1 class="display-4">Detail for #{{testcase}}</h1>
           <p class="lead">with precision {{precision}}</p>
         </div>
-        <!-- Distribution View -->
-        <div class="card">
-            <div class="row g-0">
-              <div class="col-md-3">
-                <img src="../../{{testcase}}_precision{{precision}}.dist.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
-              </div>
-              <div class="col-md-9">
-                <div class="card-body">
-                  <h3 class="card-title">Distribution</h3>
-                  <div class="card-text">{{dist_table|safe}}</div>
-                </div>
-              </div>
+        <div class="row">
+          <div class="col col-3">
+            <div class="sticky-top">
+              <img src="../../{{testcase}}_precision{{precision}}.name.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
             </div>
           </div>
-          <!-- Getis Ord -->
-          <div class="card">
-            <div class="row g-0">
-              <div class="col-md-3">
-                <img src="../../{{testcase}}_precision{{precision}}.gi.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
-              </div>
-              <div class="col-md-9">
-                <div class="card-body">
-                  <h3 class="card-title">Getis Ord</h3>
-                  <p class="card-text">Global</p>
-                  <div class="card-text">{{g_global_table|safe}}</div>
-                  <hr>
-                  <p class="card-text">Local</p>
-                  <div class="card-text">{{gi_table|safe}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Getis Ord GiStar-->
-          <div class="card">
-            <div class="row g-0">
-              <div class="col-md-3">
-                <img src="../../{{testcase}}_precision{{precision}}.gistar.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
-              </div>
-              <div class="col-md-9">
-                <div class="card-body">
-                  <h3 class="card-title">Getis Ord GiStar</h3>
-                  <p class="card-text">Global</p>
-                  <div class="card-text">{{g_global_table|safe}}</div>
-                  <hr>
-                  <p class="card-text">Local</p>
-                  <div class="card-text">{{gistar_table|safe}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Local Moran I-->
-          <div class="card">
-            <div class="row g-0">
-              <div class="col-md-3">
-                <img src="../../{{testcase}}_precision{{precision}}.lisa.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
-                <img src="../../{{testcase}}_precision{{precision}}.moran.scatter.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
-              </div>
-              <div class="col-md-9">
-                <div class="card-body">
-                  <h3 class="card-title">Moran's I coefficient</h3>
-                  <p class="card-text">Global</p>
-                  <div class="card-text">{{moran_global_table|safe}}</div>
-                  <hr>
-                  <p class="card-text">Local</p>
-                  <div class="card-text">{{lisa_table|safe}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Geary C-->
-          <div class="card">
-            <div class="row g-0">
-              <div class="col-md-3">
-                <img src="../../{{testcase}}_precision{{precision}}.c.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
-              </div>
-              <div class="col-md-9">
-                <div class="card-body">
-                  <h3 class="card-title">Geary's C</h3>
-                  <p class="card-text">Global</p>
-                  <div class="card-text">{{c_global_table|safe}}</div>
-                  <hr>
-                  <p class="card-text">Local</p>
-                  <div class="card-text">{{c_local_table|safe}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="col col-9">
+  <!-- Distribution View -->
+  <div class="card">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="../../{{testcase}}_precision{{precision}}.dist.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+      </div>
+      <div class="col-md-9">
+        <div class="card-body">
+          <h3 class="card-title">Distribution</h3>
+          <div class="card-text">{{dist_table|safe}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Getis Ord -->
+  <div class="card">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="../../{{testcase}}_precision{{precision}}.gi.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+      </div>
+      <div class="col-md-9">
+        <div class="card-body">
+          <h3 class="card-title">Getis Ord</h3>
+          <p class="card-text">Global</p>
+          <div class="card-text">{{g_global_table|safe}}</div>
+          <hr>
+          <p class="card-text">Local</p>
+          <div class="card-text">{{gi_table|safe}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Getis Ord GiStar-->
+  <div class="card">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="../../{{testcase}}_precision{{precision}}.gistar.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.dist.png">
+      </div>
+      <div class="col-md-9">
+        <div class="card-body">
+          <h3 class="card-title">Getis Ord GiStar</h3>
+          <p class="card-text">Global</p>
+          <div class="card-text">{{g_global_table|safe}}</div>
+          <hr>
+          <p class="card-text">Local</p>
+          <div class="card-text">{{gistar_table|safe}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Local Moran I-->
+  <div class="card">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="../../{{testcase}}_precision{{precision}}.lisa.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+        <img src="../../{{testcase}}_precision{{precision}}.moran.scatter.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+      </div>
+      <div class="col-md-9">
+        <div class="card-body">
+          <h3 class="card-title">Moran's I coefficient</h3>
+          <p class="card-text">Global</p>
+          <div class="card-text">{{moran_global_table|safe}}</div>
+          <hr>
+          <p class="card-text">Local</p>
+          <div class="card-text">{{lisa_table|safe}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Geary C-->
+  <div class="card">
+    <div class="row g-0">
+      <div class="col-md-3">
+        <img src="../../{{testcase}}_precision{{precision}}.c.png" class="img-fluid rounded-start" alt="{{testcase}}_precision{{precision}}.lisa.png">
+      </div>
+      <div class="col-md-9">
+        <div class="card-body">
+          <h3 class="card-title">Geary's C</h3>
+          <p class="card-text">Global</p>
+          <div class="card-text">{{c_global_table|safe}}</div>
+          <hr>
+          <p class="card-text">Local</p>
+          <div class="card-text">{{c_local_table|safe}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        </div>
+        
     </div>
 </body>
 </html>
