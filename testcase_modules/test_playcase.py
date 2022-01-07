@@ -45,9 +45,9 @@ class TestPlayCase:
                 dataloading_obj.to_csv(os.path.join("output/testcase_output",file_name.split('.')[0]+f"_precision{precision}"+".csv"))
 
                 file_name=file_name.split('.')[0]+f"_precision{precision}"
+                self._plot_dist(dataloading_obj,file_name)
                 self._plot_map_with_name(dataloading_obj,file_name,num_layer)
                 self._plot_weight(geopackage_obj,file_name)
-                self._plot_dist(dataloading_obj,file_name)
                 self._plot_local_gi(dataloading_obj,geopackage_obj,file_name)
                 self._plot_local_gistar(dataloading_obj,geopackage_obj,file_name)
                 self._plot_moran(dataloading_obj,geopackage_obj,file_name)
