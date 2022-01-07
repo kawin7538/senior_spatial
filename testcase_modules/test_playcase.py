@@ -32,7 +32,7 @@ class TestPlayCase:
 
     def _play_case(self):
         if self.full_precision:
-            list_precision=[100,99,95,90,75,50]
+            list_precision=[100,99,95,90,75,50,25]
         else:
             list_precision=[100]
         for precision in list_precision:
