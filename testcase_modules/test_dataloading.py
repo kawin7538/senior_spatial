@@ -22,10 +22,14 @@ class TestDataLoading:
             # temp_value=0.5
             if word=="high":
                 ans_list.append(temp_value*10000)
+            elif word=='high2':
+                ans_list.append(temp_value*5550)
             elif word=="mid":
-                ans_list.append(temp_value*5005)
+                ans_list.append(temp_value*5050)
+            elif word=='low2':
+                ans_list.append(temp_value*4550)
             elif word=="low":
-                ans_list.append(temp_value*10)
+                ans_list.append(temp_value*100)
         return ans_list
 
     def to_csv(self,filename):

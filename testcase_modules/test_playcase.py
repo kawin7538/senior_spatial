@@ -19,7 +19,9 @@ from testcase_modules.test_dataloading import TestDataLoading
 from testcase_modules.test_geopackage import TestGEOPackage
 
 class TestPlayCase:
-    def __init__(self) -> None:
+    def __init__(self,full_precision=True) -> None:
+        print("Running Testcase with full_precision =",full_precision)
+        self.full_precision=full_precision
         self.list_file_name=os.listdir("testcase_modules/testcase_input")
         self._check_count_files()
         self._play_case()
@@ -29,7 +31,11 @@ class TestPlayCase:
         print(f"{number_files} test case(s).")
 
     def _play_case(self):
-        for precision in [100,99,95,90,75,50]:
+        if self.full_precision:
+            list_precision=[100,99,95,90,75,50]
+        else:
+            list_precision=[100]
+        for precision in list_precision:
             for file_name in tqdm(sorted(self.list_file_name),desc=f"Precision{precision}"):
                 input_value=self._read_file("testcase_modules/testcase_input",file_name)
                 num_layer, selected_layer, selected_name = input_value[0][:-1]
