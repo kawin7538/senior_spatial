@@ -13,7 +13,7 @@ Structure of .in files
         - First line contains four parameters as follow: layer depth for preparing data, layer depth for filter, filter property (name, etc.), and percent adjust (0-100) that defined for random interval.
         - Second line consists of n classified values for n nodes in map, input as "high" and "low".
 
-Description in each .in files
+Description in each .in files (original testcases)
     
     - 1-2.in
     Prachuap Khiri Khan, segregated pattern.
@@ -41,3 +41,8 @@ Description in each .in files
 
     - 20-21.in
     Satun, linear separation
+
+Synthesized test case from Original Test Case
+
+    - 1000 series (1xxx.in)
+    replace low and high value with nearly values with mid value
