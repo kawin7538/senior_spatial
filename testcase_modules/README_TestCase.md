@@ -1,7 +1,7 @@
 # Description for TestCase
 
 ## Iteration through value precise
-all the inputs will be iterately with precise value from 100, 99, 95, 90, 75, 50 percent
+all the inputs will be iterately with precise value from 100, 90, 75, 50 percent
 
 ## Structure of ```.in``` files
 
@@ -52,18 +52,18 @@ Nakhon Ratchasima, Dart-Like shape
 
 ## Synthesized test case from Original Test Case
 
-- 0000 series (xx or xxx.in)
+- 0000 series (```xx or xxx.in```)
 
 Original input with extremely values
 
-- 1000 series (1xxx.in)
+- 1000 series (```1xxx.in```)
 
 replace low and high value with nearly values with mid value
 
-- 2000 series (2xxx.in)
+- 2000 series (```2xxx.in```)
 
 replace mid and high value with nearly values with low value
 
-- 3000 series (3xxx.in)
+- 3000 series (```3xxx.in```)
 
 replace mid and low value with nearly values with high value

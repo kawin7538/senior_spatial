@@ -4,6 +4,9 @@ from flask import Flask, render_template, url_for, send_from_directory
 from turbo_flask import Turbo
 import threading
 import time
+import markdown
+from markdown.extensions import fenced_code,codehilite
+from pygments.formatters import HtmlFormatter
 
 app = Flask(__name__,static_folder='output/testcase_output', static_url_path='')
 turbo = Turbo(app)
@@ -15,6 +18,18 @@ def main():
     # list_precision=[i.split('_precision')[-1] for i in list_allcase]
     # return render_template("index.html",list_allcase=list_allcase,list_casenumber=list_casenumber,list_precision=list_precision)
     return render_template("index.html")
+
+@app.route('/readme')
+def readme():
+    readme_file=open("testcase_modules/README_TestCase.md","r")
+    md_template_string=markdown.markdown(
+        readme_file.read(), extensions=['fenced_code','codehilite']
+    )
+    formatter = HtmlFormatter(style="emacs",full=True,cssclass="codehilite")
+    css_string = formatter.get_style_defs()
+    md_css_string = "<style>" + css_string + "</style>"
+    md_template = md_css_string + md_template_string
+    return md_template
 
 @app.route("/detail/<int:testcase>/<int:precision>")
 def detail(testcase,precision):
