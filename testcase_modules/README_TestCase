@@ -1,63 +1,69 @@
-*********************************
+# Description for TestCase
 
-Description for TestCase
+## Iteration through value precise
+all the inputs will be iterately with precise value from 100, 99, 95, 90, 75, 50 percent
 
-*********************************
+## Structure of ```.in``` files
 
-Iteration through value precise
-    - all the inputs will be iterately with precise value from 100, 99, 95, 90, 75, 50 percent
+- Each ```.in``` file consists of ***2 line***. 
+    - ***First line*** contains four parameters as follow: layer depth for preparing data, layer depth for filter, filter property (name, etc.), and percent adjust (0-100) that defined for random interval.
+    - ***Second line*** consists of n classified values for n nodes in map, input as "high" and "low".
 
-Structure of .in files
+## Description in each ```.in``` files (original testcases)
 
-    - Each .in file consists of 2 line. 
-        - First line contains four parameters as follow: layer depth for preparing data, layer depth for filter, filter property (name, etc.), and percent adjust (0-100) that defined for random interval.
-        - Second line consists of n classified values for n nodes in map, input as "high" and "low".
+- ```1-2.in```
+Prachuap Khiri Khan, segregated pattern.
 
-Description in each .in files (original testcases)
-    
-    - 1-2.in
-    Prachuap Khiri Khan, segregated pattern.
+- ```3-4.in```
+Prachuap Khiri Khan, grouped pattern.
 
-    - 3-4.in
-    Prachuap Khiri Khan, grouped pattern.
+- ```5-7.in```
+Prachuap Khiri Khan, drumbell shape, heavy-outside.
 
-    - 5-7.in
-    Prachuap Khiri Khan, drumbell shape, heavy-outside.
+- ```8-10.in```
+Prachuap Khiri Khan, drumbell shape, heavy-inside.
 
-    - 8-10.in
-    Prachuap Khiri Khan, drumbell shape, heavy-inside.
+- ```11-13.in```
+Phuket, low-value-dominant.
 
-    - 11-13.in
-    Phuket, low-value-dominant.
+- ```14-16.in```
+Phuket, high-value-dominant.
 
-    - 14-16.in
-    Phuket, high-value-dominant.
+- ```17.in```
+Pathum Thani, complete segregated
 
-    - 17.in
-    Pathum Thani, complete segregated
+- ```18-19.in```
+Nakhon Pathom, centered-grouping
 
-    - 18-19.in
-    Nakhon Pathom, centered-grouping
+- ```20-21.in```
+Satun, linear separation
 
-    - 20-21.in
-    Satun, linear separation
+- ```22-27.in```
+Nakhon Ratchasima, linear separation
 
-    - 22-27.in
-    Nakhon Ratchasima, linear separation
+- ```28-33.in```
+Nakhon Ratchasima, triangular grouping
 
-    - 28-33.in
-    Nakhon Ratchasima, triangular grouping
+- ```34-35.in```
+Nakhon Ratchasima, Center Grouping
 
-Synthesized test case from Original Test Case
+- ```36-37.in```
+Nakhon Ratchasima, Dart-Like shape
 
-    - 0000 series (xx or xxx.in)
-    Original input with extremely values
+## Synthesized test case from Original Test Case
 
-    - 1000 series (1xxx.in)
-    replace low and high value with nearly values with mid value
+- 0000 series (xx or xxx.in)
 
-    - 2000 series (2xxx.in)
-    replace mid and high value with nearly values with low value
+Original input with extremely values
 
-    - 3000 series (3xxx.in)
-    replace mid and low value with nearly values with high value
+- 1000 series (1xxx.in)
+
+replace low and high value with nearly values with mid value
+
+- 2000 series (2xxx.in)
+
+replace mid and high value with nearly values with low value
+
+- 3000 series (3xxx.in)
+
+replace mid and low value with nearly values with high value
