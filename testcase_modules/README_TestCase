@@ -42,6 +42,12 @@ Description in each .in files (original testcases)
     - 20-21.in
     Satun, linear separation
 
+    - 22-27.in
+    Nakhon Ratchasima, linear separation
+
+    - 28-33.in
+    Nakhon Ratchasima, triangular grouping
+
 Synthesized test case from Original Test Case
 
     - 0000 series (xx or xxx.in)
