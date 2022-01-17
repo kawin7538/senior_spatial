@@ -1,0 +1,19 @@
+<div class="col-md-8" id='load'>
+    <h3>{{list_allcase|length}} cases</h3>
+    <div class="row">
+        {% for i in range(0,list_allcase|length) %}
+        <div class="col-md-3">
+            <div class="card">
+                <img class="card-img-top" src="{{list_allcase[i]}}.dist.png" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">Testcase #{{list_casenumber[i]}}</h5>
+                    <p class="card-text">with precision {{list_precision[i]}}</p>
+                    <a href="detail/{{list_casenumber[i]}}/{{list_precision[i]}}"
+                        class="btn btn-primary">Show
+                        Detail</a>
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+</div>

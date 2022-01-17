@@ -1,5 +1,6 @@
 from libpysal.weights.contiguity import Queen
 from libpysal.weights.weights import W
+import numpy as np
 from data_loading.geopackage import GEOPackage
 
 class TestGEOPackage(GEOPackage):
@@ -8,6 +9,7 @@ class TestGEOPackage(GEOPackage):
         self.map=self._read_file("gadm36_THA.gpkg",f"gadm36_THA_{num_layer}")
         if num_layer>1:
             self.map=self._filter(selected_layer,selected_name)
+        self.map['centroid']=np.array(self.map.geometry.centroid)
         self.w=self._read_weight(Queen)
         if num_layer==1:
             self.w=self._custom_weight(38,47,1)

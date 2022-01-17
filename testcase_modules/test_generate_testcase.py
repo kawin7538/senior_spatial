@@ -6,6 +6,9 @@ import re
 list_orig_case = sorted(set([i for i in os.listdir("testcase_modules/testcase_input")
                         if int(i.split('.')[0]) < 1000]), key=lambda x: int(x.split('.')[0]))
 
+list_perm_case = sorted(set([i for i in os.listdir("testcase_modules/testcase_input")
+                        if int(i.split('.')[0]) >= 1000]), key=lambda x: int(x.split('.')[0]))
+
 
 def create_1000():
     # 1000 series is low mid high with low and high values nearly with mid value
@@ -54,10 +57,18 @@ def create_3000():
         f_out.close()
         # break;
 
+def del_perm_case():
+    for perm_case in tqdm(list_perm_case,desc="Delete Perm Case"):
+        if os.path.isfile(os.path.join("testcase_modules/testcase_input", perm_case)):
+            os.remove(os.path.join("testcase_modules/testcase_input", perm_case))
 
 if __name__ == '__main__':
     print("List of all original testcase")
     print(list_orig_case)
-    create_1000()
-    create_2000()
-    create_3000()
+    print(list_perm_case)
+    
+    # create_1000()
+    # create_2000()
+    # create_3000()
+
+    del_perm_case()

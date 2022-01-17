@@ -14,30 +14,14 @@
     </head>
 
     <body>
-        <div class="container" id='load'>
-            <h1>{{list_allcase|length}} cases</h1>
+        <div class="container">
+            <h1>Catalog of testcase</h1>
+            <hr>
             <div class="row">
                 <div class="col-md-4">
                     <iframe style="height: 80%; position: fixed;" src="readme" title="description"></iframe>
                 </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        {% for i in range(0,list_allcase|length) %}
-                        <div class="col-md-3">
-                            <div class="card">
-                                <img class="card-img-top" src="{{list_allcase[i]}}.dist.png" alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-title">Testcase #{{list_casenumber[i]}}</h5>
-                                    <p class="card-text">with precision {{list_precision[i]}}</p>
-                                    <a href="detail/{{list_casenumber[i]}}/{{list_precision[i]}}"
-                                        class="btn btn-primary">Show
-                                        Detail</a>
-                                </div>
-                            </div>
-                        </div>
-                        {%endfor%}
-                    </div>
-                </div>
+                {% include '_case_catalog.html' %}
 
             </div>
         </div>

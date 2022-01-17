@@ -1,7 +1,7 @@
 # Description for TestCase
 
 ## Iteration through value precise
-all the inputs will be iterately with precise value from 100, 90, 75, 50 percent
+all the inputs will be iterately with precise value from 100, 95, 90, 75 percent
 
 ## Structure of ```.in``` files
 
@@ -49,6 +49,13 @@ Nakhon Ratchasima, Center Grouping
 
 - ```36-37.in```
 Nakhon Ratchasima, Dart-Like shape
+
+- ```38-39.in```
+Thailand, Donut-like shape, with simple split like the image below <br>
+![thailand Simple Split](testcase_modules/thailand_classification.PNG)
+
+- ```40-41.in```
+Thailand, Flower-like shape
 
 ## Synthesized test case from Original Test Case
 

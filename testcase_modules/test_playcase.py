@@ -20,9 +20,10 @@ from testcase_modules.test_geopackage import TestGEOPackage
 
 
 class TestPlayCase:
-    def __init__(self, full_precision=True) -> None:
+    def __init__(self, full_precision=True, startwith100=True) -> None:
         print("Running Testcase with full_precision =", full_precision)
         self.full_precision = full_precision
+        self.startwith100=startwith100
         self.list_file_name = os.listdir("testcase_modules/testcase_input")
         self._check_count_files()
         self._play_case()
@@ -33,7 +34,10 @@ class TestPlayCase:
 
     def _play_case(self):
         if self.full_precision:
-            list_precision = [100, 90, 75, 50]
+            if self.startwith100:
+                list_precision = [100, 95, 90, 75]
+            else:
+                list_precision=[95,90,75]
         else:
             list_precision = [100]
         for precision in list_precision:
@@ -196,17 +200,17 @@ class TestPlayCase:
         moran_global = Moran(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), two_tailed=True, transformation="B", permutations=9999)
         global_moran_df = pd.DataFrame(
-            columns=['moran_value', 'moran_z_sim', 'moran_p_z_sim'])
+            columns=['moran_value', 'moran_z_sim', 'moran_p_sim'])
         global_moran_df.loc[len(global_moran_df)] = [
-            moran_global.I, moran_global.z_sim, moran_global.p_z_sim]
+            moran_global.I, moran_global.z_sim, moran_global.p_sim]
         global_moran_df.to_csv(os.path.join(
             "output/testcase_output", file_name.split('.')[0]+".moran.global.csv"), index=False)
 
         moran_local = Moran_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), transformation="B", permutations=9999)
         temp_result = dataloading_obj.map_with_data.assign(
-            moran_value=moran_local.Is, moran_z_sim=moran_local.z_sim, moran_p_z_sim_value=moran_local.p_z_sim, cl=mask_local_auto(moran_local, p=0.1)[3])
-        temp_result[[f'NAME_{dataloading_obj.num_layer}', 'moran_value', 'moran_z_sim', 'moran_p_z_sim_value', 'cl']].round(
+            moran_value=moran_local.Is, moran_z_sim=moran_local.z_sim, moran_p_sim_value=moran_local.p_sim, cl=mask_local_auto(moran_local, p=0.1)[3])
+        temp_result[[f'NAME_{dataloading_obj.num_layer}', 'moran_value', 'moran_z_sim', 'moran_p_sim_value', 'cl']].round(
             4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".lisa.csv"), index=False)
 
         fig, ax = plt.subplots(1, figsize=(12, 12))

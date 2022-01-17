@@ -5,4 +5,4 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    TestPlayCase(full_precision=False)
+    TestPlayCase(full_precision=True,startwith100=False)

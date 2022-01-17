@@ -22,6 +22,13 @@ def main():
     return render_template("index.html")
 
 
+# Custom static data
+@app.route('/testcase_modules/<path:filename>')
+def custom_static(filename):
+    # return send_from_directory(app.config['CUSTOM_STATIC_PATH'], filename)
+    assert filename[-4:]=='.PNG', "What the FUCK are you DOING!!!!"
+    return send_from_directory("testcase_modules", filename)
+
 @app.route('/readme')
 def readme():
     readme_file = open("testcase_modules/README_TestCase.md", "r")
@@ -80,8 +87,8 @@ def before_first_request():
 def update_load():
     with app.app_context():
         while True:
-            time.sleep(5)
-            turbo.push(turbo.update(render_template('index.html'), 'load'))
+            time.sleep(10)
+            turbo.push(turbo.replace(render_template('_case_catalog.html'), 'load'))
 
 
 if __name__ == "__main__":
