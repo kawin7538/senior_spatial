@@ -24,7 +24,7 @@ class TestPlayCase:
         print("Running Testcase with full_precision =", full_precision)
         self.full_precision = full_precision
         self.startwith100=startwith100
-        self.list_file_name = os.listdir("testcase_modules/testcase_input")
+        self.list_file_name = sorted(set([i for i in os.listdir("testcase_modules/testcase_input")]))
         self._check_count_files()
         self._play_case()
 
