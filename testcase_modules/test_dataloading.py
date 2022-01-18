@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import random
 from testcase_modules.test_geopackage import TestGEOPackage
 
 
@@ -17,6 +18,14 @@ class TestDataLoading:
 
     def _generate_from_centroid(self,keyword,list_centroid):
         list_classification=[]
+        if keyword=='random':
+            return [random.choice(['high','mid','low']) for _ in list_centroid]
+        if keyword=='random2':
+            return [random.choice(['high2','mid','low2']) for _ in list_centroid]
+        if keyword=='random3':
+            return [random.choice(['high3','mid2','low']) for _ in list_centroid]
+        if keyword=='random4':
+            return [random.choice(['high','mid3','low3']) for _ in list_centroid]
         for centroid in list_centroid:
             # split right with Nakhon Ratchasima
             if centroid.x>102.097771:
@@ -49,6 +58,33 @@ class TestDataLoading:
                 5:'low',
                 6:'high'
             }
+        elif keyword=='outside-high2':
+            dict_value={
+                1:'high2',
+                2:'high2',
+                3:'high2',
+                4:'high2',
+                5:'low2',
+                6:'high2'
+            }
+        elif keyword=='outside-high3':
+            dict_value={
+                1:'high3',
+                2:'high3',
+                3:'high3',
+                4:'high3',
+                5:'low',
+                6:'high3'
+            }
+        elif keyword=='outside-high4':
+            dict_value={
+                1:'high',
+                2:'high',
+                3:'high',
+                4:'high',
+                5:'low3',
+                6:'high'
+            }
         elif keyword=='outside-low':
             dict_value={
                 1:'low',
@@ -57,6 +93,33 @@ class TestDataLoading:
                 4:'low',
                 5:'high',
                 6:'low'
+            }
+        elif keyword=='outside-low2':
+            dict_value={
+                1:'low2',
+                2:'low2',
+                3:'low2',
+                4:'low2',
+                5:'high2',
+                6:'low2'
+            }
+        elif keyword=='outside-low3':
+            dict_value={
+                1:'low',
+                2:'low',
+                3:'low',
+                4:'low',
+                5:'high3',
+                6:'low'
+            }
+        elif keyword=='outside-low4':
+            dict_value={
+                1:'low3',
+                2:'low3',
+                3:'low3',
+                4:'low3',
+                5:'high',
+                6:'low3'
             }
         elif keyword=='flower-high':
             dict_value={
@@ -67,6 +130,33 @@ class TestDataLoading:
                 5:'mid',
                 6:'high'
             }
+        elif keyword=='flower-high2':
+            dict_value={
+                1:'high2',
+                2:'high2',
+                3:'low2',
+                4:'low2',
+                5:'mid',
+                6:'high2'
+            }
+        elif keyword=='flower-high3':
+            dict_value={
+                1:'high3',
+                2:'high3',
+                3:'low',
+                4:'low',
+                5:'mid2',
+                6:'high3'
+            }
+        elif keyword=='flower-high4':
+            dict_value={
+                1:'high',
+                2:'high',
+                3:'low3',
+                4:'low3',
+                5:'mid3',
+                6:'high'
+            }
         elif keyword=='flower-low':
             dict_value={
                 1:'low',
@@ -75,6 +165,33 @@ class TestDataLoading:
                 4:'high',
                 5:'mid',
                 6:'low'
+            }
+        elif keyword=='flower-low2':
+            dict_value={
+                1:'low2',
+                2:'high2',
+                3:'high2',
+                4:'high2',
+                5:'mid',
+                6:'low2'
+            }
+        elif keyword=='flower-low3':
+            dict_value={
+                1:'low',
+                2:'high3',
+                3:'high3',
+                4:'high3',
+                5:'mid2',
+                6:'low'
+            }
+        elif keyword=='flower-low4':
+            dict_value={
+                1:'low3',
+                2:'high',
+                3:'high',
+                4:'high',
+                5:'mid3',
+                6:'low3'
             }
         return [*map(dict_value.get,list_classification)]
 

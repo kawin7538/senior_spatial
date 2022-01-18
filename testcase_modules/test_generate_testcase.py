@@ -16,7 +16,12 @@ def create_1000():
         f_in = open(os.path.join(
             "testcase_modules/testcase_input", orig_case), "r")
         temp_data = f_in.read()
-        temp_data = temp_data.replace("high", 'high2').replace("low", "low2")
+        if temp_data.find('random')!=-1:
+            temp_data = temp_data.replace("random", 'random2')
+        elif temp_data.find("flower")!=-1 or temp_data.find("outside")!=-1:
+            temp_data = temp_data.replace("-high", '-high2').replace("-low", '-low2')
+        else:
+            temp_data = temp_data.replace("high", 'high2').replace("low", "low2")
         case_number = int(orig_case.split('.')[0])
         f_out = open(os.path.join(
             "testcase_modules/testcase_input", f"{1000+case_number}.in"), "w")
@@ -32,7 +37,12 @@ def create_2000():
         f_in = open(os.path.join(
             "testcase_modules/testcase_input", orig_case), "r")
         temp_data = f_in.read()
-        temp_data = temp_data.replace("high", 'high3').replace("mid", "mid2")
+        if temp_data.find('random')!=-1:
+            temp_data = temp_data.replace("random", 'random3')
+        elif temp_data.find("flower")!=-1 or temp_data.find("outside")!=-1:
+            temp_data = temp_data.replace("-high", '-high3').replace("-low", '-low3')
+        else:
+            temp_data = temp_data.replace("high", 'high3').replace("mid", "mid2")
         case_number = int(orig_case.split('.')[0])
         f_out = open(os.path.join(
             "testcase_modules/testcase_input", f"{2000+case_number}.in"), "w")
@@ -48,7 +58,12 @@ def create_3000():
         f_in = open(os.path.join(
             "testcase_modules/testcase_input", orig_case), "r")
         temp_data = f_in.read()
-        temp_data = temp_data.replace("low", 'low3').replace("mid", "mid3")
+        if temp_data.find('random')!=-1:
+            temp_data = temp_data.replace("random", 'random4')
+        elif temp_data.find("flower")!=-1 or temp_data.find("outside")!=-1:
+            temp_data = temp_data.replace("-high", '-high4').replace("-low", '-low4')
+        else:
+            temp_data = temp_data.replace("low", 'low3').replace("mid", "mid3")
         case_number = int(orig_case.split('.')[0])
         f_out = open(os.path.join(
             "testcase_modules/testcase_input", f"{3000+case_number}.in"), "w")
@@ -67,8 +82,8 @@ if __name__ == '__main__':
     print(list_orig_case)
     print(list_perm_case)
     
-    # create_1000()
-    # create_2000()
-    # create_3000()
+    create_1000()
+    create_2000()
+    create_3000()
 
-    del_perm_case()
+    # del_perm_case()

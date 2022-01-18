@@ -57,6 +57,9 @@ Thailand, Donut-like shape, with simple split like the image below <br>
 - ```40-41.in```
 Thailand, Flower-like shape
 
+- ```42.in```
+Thailand, Random Pattern
+
 ## Synthesized test case from Original Test Case
 
 - 0000 series (```xx or xxx.in```)
