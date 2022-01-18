@@ -111,7 +111,7 @@ class TestPlayCase:
 
     def _plot_local_gi(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage, file_name):
         G_global = G(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), permutations=9999)
+        ), permutations=999)
         global_g_df = pd.DataFrame(columns=['G', 'G_z_sim', 'p_z_sim'])
         global_g_df.loc[len(global_g_df)] = [G_global.G,
                                              G_global.z_sim, G_global.p_z_sim]
@@ -119,17 +119,17 @@ class TestPlayCase:
             "output/testcase_output", file_name.split('.')[0]+".g.global.csv"), index=False)
 
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), star=False, transform="B", permutations=9999)
+        ), star=False, transform="B", permutations=999)
 
-        hotspot90 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.1)
-        hotspot95 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.05)
-        hotspot99 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.01)
+        hotspot90 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.1)
+        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.05)
+        hotspot99 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.01)
         hotspot90 = hotspot90 & ~hotspot95
         hotspot95 = hotspot95 & ~hotspot99
-        notsig = (gistar_local.p_z_sim > 0.1)
-        coldspot90 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.1)
-        coldspot95 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.05)
-        coldspot99 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.01)
+        notsig = (gistar_local.p_sim > 0.1)
+        coldspot90 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.1)
+        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.05)
+        coldspot99 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.01)
         coldspot90 = coldspot90 & ~coldspot95
         coldspot95 = coldspot95 & ~coldspot99
         hotcoldspot = hotspot99*1+hotspot95*2+hotspot90 * \
@@ -143,7 +143,7 @@ class TestPlayCase:
         color_labels = [color_list[::-1][i] for i in hotcoldspot]
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
-        dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.z_sim, gistar_p_value=gistar_local.p_z_sim, cl=labels)[
+        dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.Zs, gistar_p_value=gistar_local.p_sim, cl=labels)[
             [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".gi.csv"), index=False)
         dataloading_obj.map_with_data.assign(cl=labels).assign(spot=hotcoldspot).plot(
             column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='white', cmap=hmap, k=7, categories=spots[::-1], legend=True)
@@ -161,17 +161,17 @@ class TestPlayCase:
         # global_g_df.to_csv(os.path.join("output/testcase_output",file_name.split('.')[0]+".g_global.csv"),index=False)
 
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), star=True, transform="B", permutations=9999)
+        ), star=True, transform="B", permutations=999)
 
-        hotspot90 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.1)
-        hotspot95 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.05)
-        hotspot99 = (gistar_local.z_sim > 0) & (gistar_local.p_z_sim <= 0.01)
+        hotspot90 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.1)
+        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.05)
+        hotspot99 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.01)
         hotspot90 = hotspot90 & ~hotspot95
         hotspot95 = hotspot95 & ~hotspot99
-        notsig = (gistar_local.p_z_sim > 0.1)
-        coldspot90 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.1)
-        coldspot95 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.05)
-        coldspot99 = (gistar_local.z_sim < 0) & (gistar_local.p_z_sim <= 0.01)
+        notsig = (gistar_local.p_sim > 0.1)
+        coldspot90 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.1)
+        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.05)
+        coldspot99 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.01)
         coldspot90 = coldspot90 & ~coldspot95
         coldspot95 = coldspot95 & ~coldspot99
         hotcoldspot = hotspot99*1+hotspot95*2+hotspot90 * \
@@ -185,7 +185,7 @@ class TestPlayCase:
         color_labels = [color_list[::-1][i] for i in hotcoldspot]
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
-        dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.z_sim, gistar_p_value=gistar_local.p_z_sim, cl=labels)[
+        dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.Zs, gistar_p_value=gistar_local.p_sim, cl=labels)[
             [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".gistar.csv"), index=False)
         dataloading_obj.map_with_data.assign(cl=labels).assign(spot=hotcoldspot).plot(
             column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='white', cmap=hmap, k=7, categories=spots[::-1], legend=True)
@@ -198,7 +198,7 @@ class TestPlayCase:
     def _plot_moran(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage, file_name):
 
         moran_global = Moran(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), two_tailed=True, transformation="B", permutations=9999)
+        ), two_tailed=True, transformation="B", permutations=999)
         global_moran_df = pd.DataFrame(
             columns=['moran_value', 'moran_z_sim', 'moran_p_sim'])
         global_moran_df.loc[len(global_moran_df)] = [
@@ -207,7 +207,7 @@ class TestPlayCase:
             "output/testcase_output", file_name.split('.')[0]+".moran.global.csv"), index=False)
 
         moran_local = Moran_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), transformation="B", permutations=9999)
+        ), transformation="B", permutations=999)
         temp_result = dataloading_obj.map_with_data.assign(
             moran_value=moran_local.Is, moran_z_sim=moran_local.z_sim, moran_p_sim_value=moran_local.p_sim, cl=mask_local_auto(moran_local, p=0.1)[3])
         temp_result[[f'NAME_{dataloading_obj.num_layer}', 'moran_value', 'moran_z_sim', 'moran_p_sim_value', 'cl']].round(
@@ -233,7 +233,7 @@ class TestPlayCase:
 
     def _plot_geary(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage, file_name):
         c_global = Geary(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
-        ), transformation="B", permutations=9999)
+        ), transformation="B", permutations=999)
         global_c_df = pd.DataFrame(columns=['c_value', 'c_z_sim', 'c_p_z_sim'])
         global_c_df.loc[len(global_c_df)] = [c_global.C,
                                              c_global.z_sim, c_global.p_z_sim]
@@ -241,7 +241,7 @@ class TestPlayCase:
             "output/testcase_output", file_name.split('.')[0]+".c.global.csv"), index=False)
 
         c_local = Geary_Local(geopackage_obj.get_weight(
-        ), labels=True, sig=0.1, permutations=9999, keep_simulations=False)
+        ), labels=True, sig=0.1, permutations=999, keep_simulations=False)
         c_local.fit(dataloading_obj.map_with_data['value'])
         local_c_df = pd.DataFrame()
         # local_c_df=pd.DataFrame(columns=[f'NAME_{geopackage_obj.num_layer}','c_value','c_p_sim','c_label'])
