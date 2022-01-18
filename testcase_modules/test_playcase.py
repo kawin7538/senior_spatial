@@ -23,8 +23,9 @@ class TestPlayCase:
     def __init__(self, full_precision=True, startwith100=True) -> None:
         print("Running Testcase with full_precision =", full_precision)
         self.full_precision = full_precision
-        self.startwith100=startwith100
-        self.list_file_name = sorted(set([i for i in os.listdir("testcase_modules/testcase_input")]), key=lambda x: int(x.split('.')[0])%100)
+        self.startwith100 = startwith100
+        self.list_file_name = sorted(set([i for i in os.listdir(
+            "testcase_modules/testcase_input")]), key=lambda x: int(x.split('.')[0]) % 100)
         self._check_count_files()
         self._play_case()
 
@@ -37,7 +38,7 @@ class TestPlayCase:
             if self.startwith100:
                 list_precision = [100, 95, 90, 75]
             else:
-                list_precision=[90,75]
+                list_precision = [95, 90, 75]
         else:
             list_precision = [100]
         for precision in list_precision:
