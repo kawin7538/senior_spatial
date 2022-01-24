@@ -60,6 +60,9 @@ Thailand, Flower-like shape
 - ```42.in```
 Thailand, Random Pattern
 
+- ```9999.in```
+Thailand, Real Case DF 2013
+
 ## Synthesized test case from Original Test Case
 
 - 0000 series (```xx or xxx.in```)
@@ -77,3 +80,7 @@ replace mid and high value with nearly values with low value
 - 3000 series (```3xxx.in```)
 
 replace mid and low value with nearly values with high value
+
+- 9000 series (```9xxx.in```)
+
+all values in the map comes from the real values

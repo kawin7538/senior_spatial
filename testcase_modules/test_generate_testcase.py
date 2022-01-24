@@ -7,7 +7,7 @@ list_orig_case = sorted(set([i for i in os.listdir("testcase_modules/testcase_in
                         if int(i.split('.')[0]) < 1000]), key=lambda x: int(x.split('.')[0]))
 
 list_perm_case = sorted(set([i for i in os.listdir("testcase_modules/testcase_input")
-                        if int(i.split('.')[0]) >= 1000]), key=lambda x: int(x.split('.')[0]))
+                        if int(i.split('.')[0]) in range(1000,9000)]), key=lambda x: int(x.split('.')[0]))
 
 
 def create_1000():
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     print(list_orig_case)
     print(list_perm_case)
     
-    create_1000()
-    create_2000()
-    create_3000()
+    # create_1000()
+    # create_2000()
+    # create_3000()
 
-    # del_perm_case()
+    del_perm_case()

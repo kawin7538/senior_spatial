@@ -198,6 +198,10 @@ class TestDataLoading:
     def _generate_value(self, list_value, list_centroid):
         ans_list = []
         if len(list_value) == 1:
+            if list_value[0]=='real':
+                temp_df=pd.read_csv("preprocessed_data/DF/monthly_ratio/allcase_ratio_DF.csv")
+                ans_list=list(temp_df[temp_df['year']==2013]['total'].values)
+                return ans_list
             list_value = self._generate_from_centroid(
                 list_value[0], list_centroid)
         for word in list_value:
