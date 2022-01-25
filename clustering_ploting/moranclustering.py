@@ -69,7 +69,7 @@ class MoranCluster(BaseCluster):
         return local_cluster
 
     def _save_global_cluster_csv(self, data_keyword, type_keyword):
-        global_moran_df=pd.DataFrame(columns=['year','moran_value','moran_z','moran_p_value'])
+        global_moran_df=pd.DataFrame(columns=['year','moran_value','moran_E','moran_V','moran_z','moran_p_value'])
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
             
             # g_global=self.global_cluster[data_keyword][type_keyword][year]
@@ -77,7 +77,7 @@ class MoranCluster(BaseCluster):
             moran_global=pickle.load(file)
             file.close()
             
-            global_moran_df.loc[len(global_moran_df)]=[year,moran_global.I,moran_global.z_rand,moran_global.p_rand]
+            global_moran_df.loc[len(global_moran_df)]=[year,moran_global.I,moran_global.EI_sim,moran_global.VI_sim,moran_global.z_sim,moran_global.p_sim]
 
             del moran_global,file
             gc.collect()
@@ -98,9 +98,9 @@ class MoranCluster(BaseCluster):
             map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
             y=map_with_data[map_with_data['year']==year]
 
-            temp_result=y.assign(moran_value=moran_local.Is,moran_z=moran_local.z,moran_p_value=moran_local.p_sim,cl=mask_local_auto(moran_local,p=self.p_value)[3])
-            temp_result[['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
-            temp_result.loc[temp_result['moran_p_value']<=self.p_value,['NAME_1','year','moran_value','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+            temp_result=y.assign(moran_value=moran_local.Is,moran_E=moran_local.EI_sim,moran_V=moran_local.VI_sim,moran_z=moran_local.z,moran_p_value=moran_local.p_sim,cl=mask_local_auto(moran_local,p=self.p_value)[3])
+            temp_result[['NAME_1','year','moran_value','moran_E','moran_V','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+            temp_result.loc[temp_result['moran_p_value']<=self.p_value,['NAME_1','year','moran_value','moran_E','moran_V','moran_z','moran_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
 
             del file,moran_local,map_with_data,y,temp_result
             gc.collect()

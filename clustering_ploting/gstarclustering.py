@@ -82,7 +82,7 @@ class GStarCluster(BaseCluster):
         return local_cluster
 
     def _save_global_cluster_csv(self,data_keyword,type_keyword):
-        global_g_df=pd.DataFrame(columns=['year','G','G_z','G_p_value'])
+        global_g_df=pd.DataFrame(columns=['year','G','EG_sim','VG_sim','G_z_sim','G_p_value'])
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
             
             # g_global=self.global_cluster[data_keyword][type_keyword][year]
@@ -90,7 +90,7 @@ class GStarCluster(BaseCluster):
             g_global=pickle.load(file)
             file.close()
             
-            global_g_df.loc[len(global_g_df)]=[year,g_global.G,g_global.z_sim,g_global.p_sim]
+            global_g_df.loc[len(global_g_df)]=[year,g_global.G,g_global.EG_sim,g_global.VG_sim,g_global.z_sim,g_global.p_sim]
 
             del g_global,file
             gc.collect()
@@ -127,8 +127,8 @@ class GStarCluster(BaseCluster):
 
                 map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
                 y=map_with_data[map_with_data['year']==year]
-                y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels)[['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
-                y.assign(gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels).loc[~notsig,['NAME_1','year','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+                y.assign(gistar_G=gistar_local.Gs,gistar_E=gistar_local.EG_sim,gistar_V=gistar_local.VG_sim,gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels)[['NAME_1','year','gistar_G','gistar_E','gistar_V','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
+                y.assign(gistar_G=gistar_local.Gs,gistar_E=gistar_local.EG_sim,gistar_V=gistar_local.VG_sim,gistar_Z=gistar_local.Zs,gistar_p_value=gistar_local.p_sim,cl=labels).loc[~notsig,['NAME_1','year','gistar_G','gistar_E','gistar_V','gistar_Z','gistar_p_value','cl']].round(4).to_csv(self.local_path_sig.format(self.data.base_output_path,data_keyword,type_keyword,year),index=False)
 
                 del file,gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
                 gc.collect()

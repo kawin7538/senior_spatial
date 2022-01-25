@@ -39,7 +39,7 @@ if __name__ == '__main__':
         range_year=range(2011,2021),
     )
 
-    PopulationPlot(data).summary_plot(0.6)
+    # PopulationPlot(data).summary_plot(0.6)
 
     # corr_data=CorrCustomizeData(data,func_keyword='pearsonr')
     # corr_data.save_csv()
@@ -79,28 +79,28 @@ if __name__ == '__main__':
     # del cluster_obj,plot_obj
     # gc.collect()
 
-    # cluster_obj=GStarCluster(data,100000)
-    # cluster_obj.save_global_cluster_csv()
-    # cluster_obj.save_local_cluster_csv()
-    # plot_obj=GStarPlot(cluster_obj)
-    # # plot_obj.plot_preview()
-    # plot_obj.save_local_cluster_plot_png()
+    cluster_obj=GStarCluster(data,100000)
+    cluster_obj.save_global_cluster_csv()
+    cluster_obj.save_local_cluster_csv()
+    plot_obj=GStarPlot(cluster_obj)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
 
-    # del cluster_obj,plot_obj
-    # gc.collect()
+    del cluster_obj,plot_obj
+    gc.collect()
 
-    # cluster_obj=MoranCluster(data,100000,p_value=0.05)
-    # cluster_obj.save_global_cluster_csv()
-    # cluster_obj.save_local_cluster_csv()
-    # plot_obj=LISAPlot(cluster_obj)
-    # # plot_obj.plot_preview()
-    # plot_obj.save_local_cluster_plot_png()
-    # plot_obj=MoranLocalScatterPlot(cluster_obj)
-    # # plot_obj.plot_preview()
-    # plot_obj.save_local_cluster_plot_png()
+    cluster_obj=MoranCluster(data,100000,p_value=0.05)
+    cluster_obj.save_global_cluster_csv()
+    cluster_obj.save_local_cluster_csv()
+    plot_obj=LISAPlot(cluster_obj)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
+    plot_obj=MoranLocalScatterPlot(cluster_obj)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
 
-    # del cluster_obj,plot_obj
-    # gc.collect()
+    del cluster_obj,plot_obj
+    gc.collect()
 
     # sys.stderr = original_stderr
     # sys.stdout = original_stdout
