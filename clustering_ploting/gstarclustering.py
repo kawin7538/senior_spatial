@@ -190,3 +190,36 @@ class GStarPlot(BasePlot):
             err_file.write(s)
             err_file.close()
             print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
+
+class GStarVPlot(BasePlot):
+    def __init__(self, cluster: BaseCluster) -> None:
+        super(GStarVPlot,self).__init__(cluster)
+        self.keyword="GStar Variance Plot"
+        self.path="{}/gstar/{}/{}/{}.V.png"
+
+    def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
+
+        try:
+
+            fig,ax=plt.subplots(1,figsize=(9,12))
+            map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+            y=map_with_data[map_with_data['year']==year]
+
+            # gistar_local=self.local_cluster[data_keyword][type_keyword][year]
+            file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
+            gistar_local=pickle.load(file)
+            file.close()
+
+            y.assign(V=gistar_local.VG_sim).plot(column='V',ax=ax,cmap='RdYlGn_r',edgecolor=(0,0,0,1),linewidth=1,legend=True)
+            ax.set_axis_off()
+            plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+
+            del gistar_local,map_with_data,y
+            gc.collect()
+
+        except Exception as e:
+            s=str(e)
+            err_file=open(f"output/log/error/_make_local_cluster_plot_{self.data.load_ratio}_{self.keyword}_{data_keyword}_{type_keyword}_{year}.err",'w')
+            err_file.write(s)
+            err_file.close()
+            print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")

@@ -128,6 +128,29 @@ class LISAPlot(BasePlot):
         del moran_local,map_with_data,y
         gc.collect()
 
+class LISAVPlot(BasePlot):
+    def __init__(self, cluster: BaseCluster) -> None:
+        super().__init__(cluster)
+        self.keyword="LISA Variance Plot"
+        self.path="{}/moran/{}/{}/LISA_{}.V.png"
+    
+    def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
+        fig,ax=plt.subplots(1,figsize=(9,12))
+        map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+        y=map_with_data[map_with_data['year']==year]
+
+        file=open(self.cluster.local_cluster[data_keyword][type_keyword][year],'rb')
+        moran_local=pickle.load(file)
+        file.close()
+
+        y.assign(V=moran_local.VI_sim).plot(column='V',ax=ax,cmap='RdYlGn_r',edgecolor=(0,0,0,1),linewidth=1,legend=True)
+        ax.set_axis_off()
+
+        plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+
+        del moran_local,map_with_data,y
+        gc.collect()
+
 class MoranLocalScatterPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
         super().__init__(cluster)

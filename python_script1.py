@@ -15,8 +15,8 @@ import warnings
 
 import pandas as pd
 
-from clustering_ploting.gstarclustering import GStarCluster, GStarPlot
-from clustering_ploting.moranclustering import (LISAPlot, MoranCluster,
+from clustering_ploting.gstarclustering import GStarCluster, GStarPlot, GStarVPlot
+from clustering_ploting.moranclustering import (LISAPlot, LISAVPlot, MoranCluster,
                                                 MoranLocalScatterPlot)
 from clustering_ploting.noclustering import NoCluster, NoPlot
 from clustering_ploting.spatialcorrplot import SpatialCorrPlot
@@ -85,6 +85,8 @@ if __name__ == '__main__':
     plot_obj=GStarPlot(cluster_obj)
     # plot_obj.plot_preview()
     plot_obj.save_local_cluster_plot_png()
+    plot_obj=GStarVPlot(cluster_obj)
+    plot_obj.save_local_cluster_plot_png()
 
     del cluster_obj,plot_obj
     gc.collect()
@@ -94,6 +96,8 @@ if __name__ == '__main__':
     cluster_obj.save_local_cluster_csv()
     plot_obj=LISAPlot(cluster_obj)
     # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
+    plot_obj=LISAVPlot(cluster_obj)
     plot_obj.save_local_cluster_plot_png()
     plot_obj=MoranLocalScatterPlot(cluster_obj)
     # plot_obj.plot_preview()
