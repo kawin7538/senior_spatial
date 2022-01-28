@@ -18,7 +18,7 @@ import pandas as pd
 from clustering_ploting.gstarclustering import GStarCluster, GStarPlot, GStarVPlot
 from clustering_ploting.moranclustering import (LISAPlot, LISAVPlot, MoranCluster,
                                                 MoranLocalScatterPlot)
-from clustering_ploting.noclustering import NoCluster, NoPlot
+from clustering_ploting.noclustering import NoCluster, NoPlot, NoVPlot
 from clustering_ploting.spatialcorrplot import SpatialCorrPlot
 from data_loading import DataLoading
 from data_loading.corr_customize_data import CorrCustomizeData
@@ -69,42 +69,45 @@ if __name__ == '__main__':
     # corr_plot.make_pval_plot()
     # corr_plot.make_scatter_plot()
 
-    # cluster_obj=NoCluster(data,100000)
+    cluster_obj=NoCluster(data,100000)
     # plot_obj=NoPlot(cluster_obj,(0.5,0.3))
     # # plot_obj.plot_preview(bbox_inches='tight')
     # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
+    plot_obj=NoVPlot(cluster_obj,(1,1))
+    # plot_obj.plot_preview(bbox_inches='tight')
+    plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
 
     # SummaryDistPlot(plot_obj).save_png_horizontal()
+
+    del cluster_obj,plot_obj
+    gc.collect()
+
+    # cluster_obj=GStarCluster(data,100000)
+    # cluster_obj.save_global_cluster_csv()
+    # cluster_obj.save_local_cluster_csv()
+    # plot_obj=GStarPlot(cluster_obj)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
+    # plot_obj=GStarVPlot(cluster_obj)
+    # plot_obj.save_local_cluster_plot_png()
 
     # del cluster_obj,plot_obj
     # gc.collect()
 
-    cluster_obj=GStarCluster(data,100000)
-    cluster_obj.save_global_cluster_csv()
-    cluster_obj.save_local_cluster_csv()
-    plot_obj=GStarPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
-    plot_obj=GStarVPlot(cluster_obj)
-    plot_obj.save_local_cluster_plot_png()
+    # cluster_obj=MoranCluster(data,100000,p_value=0.05)
+    # cluster_obj.save_global_cluster_csv()
+    # cluster_obj.save_local_cluster_csv()
+    # plot_obj=LISAPlot(cluster_obj)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
+    # plot_obj=LISAVPlot(cluster_obj)
+    # plot_obj.save_local_cluster_plot_png()
+    # plot_obj=MoranLocalScatterPlot(cluster_obj)
+    # # plot_obj.plot_preview()
+    # plot_obj.save_local_cluster_plot_png()
 
-    del cluster_obj,plot_obj
-    gc.collect()
-
-    cluster_obj=MoranCluster(data,100000,p_value=0.05)
-    cluster_obj.save_global_cluster_csv()
-    cluster_obj.save_local_cluster_csv()
-    plot_obj=LISAPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
-    plot_obj=LISAVPlot(cluster_obj)
-    plot_obj.save_local_cluster_plot_png()
-    plot_obj=MoranLocalScatterPlot(cluster_obj)
-    # plot_obj.plot_preview()
-    plot_obj.save_local_cluster_plot_png()
-
-    del cluster_obj,plot_obj
-    gc.collect()
+    # del cluster_obj,plot_obj
+    # gc.collect()
 
     # sys.stderr = original_stderr
     # sys.stdout = original_stdout
