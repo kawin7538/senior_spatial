@@ -18,7 +18,7 @@ import pandas as pd
 from clustering_ploting.gstarclustering import GStarCluster, GStarPlot, GStarVPlot
 from clustering_ploting.moranclustering import (LISAPlot, LISAVPlot, MoranCluster,
                                                 MoranLocalScatterPlot)
-from clustering_ploting.noclustering import NoCluster, NoPlot, NoVPlot
+from clustering_ploting.noclustering import NoCluster, NoPlot, NoPlotNoScale, NoVPlot
 from clustering_ploting.spatialcorrplot import SpatialCorrPlot
 from data_loading import DataLoading
 from data_loading.corr_customize_data import CorrCustomizeData
@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    load_ratio=True
+    load_ratio=False
 
     print("Program Started with load_ratio =",load_ratio)
 
@@ -73,9 +73,11 @@ if __name__ == '__main__':
     # plot_obj=NoPlot(cluster_obj,(0.5,0.3))
     # # plot_obj.plot_preview(bbox_inches='tight')
     # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
+    plot_obj=NoPlotNoScale(cluster_obj)
+    plot_obj.save_local_cluster_plot_png()
     plot_obj=NoVPlot(cluster_obj,(1,1))
     # plot_obj.plot_preview(bbox_inches='tight')
-    plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
+    plot_obj.save_local_cluster_plot_png()
 
     # SummaryDistPlot(plot_obj).save_png_horizontal()
 

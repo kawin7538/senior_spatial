@@ -38,6 +38,21 @@ class NoPlot(BasePlot):
         # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
         # return fig,ax
 
+class NoPlotNoScale(BasePlot):
+    def __init__(self, cluster: BaseCluster) -> None:
+        super(NoPlotNoScale,self).__init__(cluster)
+        self.keyword="Distribution Plot (No Scale)"
+        self.path="{}/distribution/{}/{}/{}.noscale.png"
+
+    def _make_local_cluster_plot(self,year,data_keyword,type_keyword,idx):
+        fig,ax=plt.subplots(1,figsize=(9,12))
+        map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
+        y=map_with_data[map_with_data['year']==year]
+        y.plot(column='total',legend=True,ax=ax,cmap='Oranges',edgecolor=(0,0,0,1),linewidth=1)
+        ax.set_axis_off()
+        # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+        # return fig,ax
+
 class NoVPlot(BasePlot):
     def __init__(self, cluster: BaseCluster,gamma) -> None:
         super(NoVPlot,self).__init__(cluster)
