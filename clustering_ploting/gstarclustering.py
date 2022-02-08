@@ -14,6 +14,14 @@ from .base import BaseCluster, BasePlot
 
 class GStarCluster(BaseCluster):
     def __init__(self, data: DataLoading, multiplier,permutations=9999) -> None:
+        '''
+        This function is used to load the data and set the output folder.
+        
+        :param data: The DataLoading object that contains the data
+        :type data: DataLoading
+        :param multiplier: The number of times to run the model
+        :param permutations: The number of permutations to run, defaults to 9999 (optional)
+        '''
         super().__init__(data, multiplier=multiplier)
         # self.data.set_inner_loop(77,1)
         self.global_keyword="G_Global"
@@ -32,6 +40,22 @@ class GStarCluster(BaseCluster):
         self.local_cluster=self.process_local_cluster()
 
     def _process_global_cluster(self,global_cluster,data_keyword,type_keyword):
+        '''
+        This function is used to create the global graph for each year and save it in a pickle file
+        
+        :param global_cluster: a dictionary that will be used to store the global cluster models
+        :param data_keyword: the keyword of the data to be used
+        :param type_keyword: The type of the data. For example, if the data is the number of patents,
+        then the type_keyword is "patent"
+        :return: A dictionary with the following structure:
+            {
+                "data_keyword":{
+                    "type_keyword":{
+                        "year":path_to_file
+                    }
+                }
+            }
+        '''
         for year in tqdm(self.range_year,desc=f"{self.global_keyword} {data_keyword} {type_keyword}"):
             map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
             y=map_with_data[map_with_data['year']==year]
@@ -49,6 +73,24 @@ class GStarCluster(BaseCluster):
         return global_cluster
 
     def _process_local_cluster(self, local_cluster, data_keyword, type_keyword):
+        '''
+        This function is used to calculate the local cluster for each year. 
+        
+        The input is the local cluster, which is a dictionary. 
+        
+        The output is the local cluster, which is a dictionary. 
+        
+        The function will loop through the year range, and calculate the local cluster for each year. 
+        
+        The function will save the local cluster in the local_dump_model_path. 
+        
+        The function will return the local cluster.
+        
+        :param local_cluster: a dictionary that stores the local cluster models
+        :param data_keyword: the keyword of the data set that you want to analyze
+        :param type_keyword: the type of the data, e.g. "income"
+        :return: A dictionary of dictionaries of dictionaries.
+        '''
         for year in tqdm(self.range_year,desc=f"{self.local_keyword} {data_keyword} {type_keyword}"):
             try:
                 map_with_data=self.data.get_map_with_data(data_keyword=data_keyword,type_keyword=type_keyword)
@@ -82,6 +124,12 @@ class GStarCluster(BaseCluster):
         return local_cluster
 
     def _save_global_cluster_csv(self,data_keyword,type_keyword):
+        '''
+        This function is used to save the global cluster dataframe to csv file
+        
+        :param data_keyword: the keyword of the data set that you want to analyze
+        :param type_keyword: the type of the graph, e.g. 'co_occurrence'
+        '''
         global_g_df=pd.DataFrame(columns=['year','G','EG_sim','VG_sim','G_z_sim','G_p_value'])
         for year in tqdm(self.range_year,desc=f"sav {self.global_keyword} {data_keyword} {type_keyword}"):
             
@@ -101,6 +149,12 @@ class GStarCluster(BaseCluster):
         gc.collect()
 
     def _save_local_cluster_csv(self,data_keyword,type_keyword):
+        '''
+        Save the local cluster results to csv files
+        
+        :param data_keyword: the keyword of the data set that you want to analyze
+        :param type_keyword: the type of the data, e.g. 'GDP'
+        '''
         spots=['not-significant','hotspot-0.01','hotspot-0.05','hotspot-0.1','coldspot-0.1','coldspot-0.05','coldspot-0.01']
         for year in tqdm(self.range_year,desc=f"sav {self.local_keyword} {data_keyword} {type_keyword}"):
 
@@ -140,13 +194,38 @@ class GStarCluster(BaseCluster):
                 err_file.close()
                 print(f"{self.local_keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
 
+# The code above is the core of the G* algorithm. It is the code that actually runs the G* algorithm
+# on the data. 
+# 
+# The code above is the core of the G* algorithm. It is the code that actually runs the G* algorithm
+# on the data. 
+# 
+# The code above is the core of the G* algorithm. It is the code that actually runs the G* algorithm
+# on the data. 
+# 
+# The code above is the core of the G* algorithm. It is the code that actually runs the G* algorithm
+# on the data.
 class GStarPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
+        '''
+        This function is the constructor of the class
+        
+        :param cluster: the cluster object that this plotter is associated with
+        :type cluster: BaseCluster
+        '''
         super(GStarPlot,self).__init__(cluster)
         self.keyword="GStar Plot"
         self.path="{}/gstar/{}/{}/{}.png"
 
     def _make_local_cluster_plot(self,year,data_keyword,type_keyword,idx):
+        '''
+        It makes a plot of the local cluster map
+        
+        :param year: the year of the data
+        :param data_keyword: the keyword of the data set, e.g. 'GHS2000'
+        :param type_keyword: 'all' or 'type'
+        :param idx: the index of the cluster
+        '''
 
         try:
 
@@ -191,13 +270,44 @@ class GStarPlot(BasePlot):
             err_file.close()
             print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
 
+# The GStarVPlot class is a subclass of BasePlot. 
+# It inherits the BasePlot attributes and methods. 
+# used to plot the variance of the G* values of the local cluster. 
+# The plot is a map with the G* values of the local cluster as the color. 
+# The map is generated by the get_map_with_data method of the Data class. 
+# The G* values are calculated by the GStar class. 
+# The G* values are stored in the local cluster. 
+# The G*
 class GStarVPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
+        '''
+        The __init__ function is called when an instance of the class is created. 
+        used to initialize the attributes of the class. 
+        
+        The super function is used to call the __init__ function of the parent class. 
+        
+        The keyword argument is used to define the name of the class. 
+        
+        The path argument is used to define the path where the plot will be saved.
+        
+        :param cluster: the cluster object that is being used
+        :type cluster: BaseCluster
+        '''
         super(GStarVPlot,self).__init__(cluster)
         self.keyword="GStar Variance Plot"
         self.path="{}/gstar/{}/{}/{}.V.png"
 
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
+        '''
+        It makes a plot of the local cluster of a given year
+        
+        :param year: the year of the data
+        :type year: int
+        :param data_keyword: the keyword of the data set, e.g. 'GDP'
+        :param type_keyword: 'all', 'type1', 'type2', 'type3', 'type4', 'type5', 'type6', 'type7',
+        'type8', 'type9', 'type10', 'type11', 'type12', 'type13', 'type14', '
+        :param idx: the index of the map in the list of maps
+        '''
 
         try:
 

@@ -6,8 +6,6 @@ from .geopackage import GEOPackage
 
 class DataLoading(GEOPackage,Distribution_Data):
     def __init__(self,load_ratio=True,range_year=range(2011,2021)) -> None:
-        # GEOPackage.__init__(self)
-        # Distribution_Data.__init__(self,load_ratio=True)
         print("Data Loading")
         super(DataLoading,self).__init__(load_ratio=load_ratio,range_year=range_year)
         self.list_case_map=self._merge(self.list_case_df)
@@ -64,7 +62,4 @@ class DataLoading(GEOPackage,Distribution_Data):
                 max_value=self.list_death_map[self.list_type_keyword.index(type_keyword)]['total'].max()
             list_minmax_value.append((min_value,max_value))
         return list_minmax_value
-
-    # def __repr__(self):
-    #     super(DataLoading,self).__repr__()
     
