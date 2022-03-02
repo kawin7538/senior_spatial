@@ -25,12 +25,13 @@ from data_loading.corr_customize_data import CorrCustomizeData
 from data_loading.corr_customize_data_log_monthly import CorrCustomizeDataLogMonthly
 from data_loading.corr_customize_data_monthly import CorrCustomizeDataMonthly
 from summary_plotting.summarydistplot import SummaryDistPlot
+from summary_plotting.summarygstarplot import SummaryGStarPlot
 
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    load_ratio=False
+    load_ratio=True
 
     print("Program Started with load_ratio =",load_ratio)
 
@@ -69,32 +70,34 @@ if __name__ == '__main__':
     # corr_plot.make_pval_plot()
     # corr_plot.make_scatter_plot()
 
-    cluster_obj=NoCluster(data,100000)
+    # cluster_obj=NoCluster(data,100000)
     # plot_obj=NoPlot(cluster_obj,(0.5,0.3))
     # # plot_obj.plot_preview(bbox_inches='tight')
     # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
-    plot_obj=NoPlotNoScale(cluster_obj)
-    plot_obj.save_local_cluster_plot_png()
-    plot_obj=NoVPlot(cluster_obj,(1,1))
+    # plot_obj=NoPlotNoScale(cluster_obj)
+    # plot_obj.save_local_cluster_plot_png()
+    # plot_obj=NoVPlot(cluster_obj,(1,1))
     # plot_obj.plot_preview(bbox_inches='tight')
-    plot_obj.save_local_cluster_plot_png()
+    # plot_obj.save_local_cluster_plot_png()
 
     # SummaryDistPlot(plot_obj).save_png_horizontal()
 
-    del cluster_obj,plot_obj
-    gc.collect()
+    # del cluster_obj,plot_obj
+    # gc.collect()
 
-    # cluster_obj=GStarCluster(data,100000)
+    cluster_obj=GStarCluster(data,100000)
     # cluster_obj.save_global_cluster_csv()
     # cluster_obj.save_local_cluster_csv()
-    # plot_obj=GStarPlot(cluster_obj)
-    # # plot_obj.plot_preview()
-    # plot_obj.save_local_cluster_plot_png()
+    plot_obj=GStarPlot(cluster_obj)
+    # plot_obj.plot_preview(bbox_inches='tight')
+    plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
     # plot_obj=GStarVPlot(cluster_obj)
     # plot_obj.save_local_cluster_plot_png()
 
-    # del cluster_obj,plot_obj
-    # gc.collect()
+    SummaryGStarPlot(plot_obj).save_png_horizontal()
+
+    del cluster_obj,plot_obj
+    gc.collect()
 
     # cluster_obj=MoranCluster(data,100000,p_value=0.05)
     # cluster_obj.save_global_cluster_csv()

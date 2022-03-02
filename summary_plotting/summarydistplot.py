@@ -15,51 +15,52 @@ class SummaryDistPlot:
         self.path=self.plot_obj.path
         self.list_type_keyword=self.plot_obj.data.list_type_keyword
         self.range_year=self.plot_obj.data.range_year
+        self.summary_keyword='distribution'
 
-    def save_png_all(self):
-        for data_keyword in ['case','death']:
-            list_image=[]
-            for type_keyword in self.list_type_keyword:
-                temp_list_image=[]
-                for year in self.range_year:
-                    temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
-                list_image.append(temp_list_image)
-                del temp_list_image
-                gc.collect()
-            for i in range(len(list_image)):
-                list_image[i]=np.concatenate(list_image[i],axis=0)
-                temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
-                temp_path="/".join(temp_path.split('/')[:4])
-                cv2.imwrite(f"{temp_path}/{2011+i}.png",list_image[i])
-            # final_image=np.concatenate(list_image,axis=1)
-            # temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
-            # temp_path="/".join(temp_path.split('/')[:4])
-            # print(f"{temp_path}/summary_preview.png")
-            # cv2.imwrite(f"{temp_path}/summary_preview.png",final_image)
-            # del list_image, final_image
-            del list_image
-            gc.collect()
+    # def save_png_all(self):
+    #     for data_keyword in ['case','death']:
+    #         list_image=[]
+    #         for type_keyword in self.list_type_keyword:
+    #             temp_list_image=[]
+    #             for year in self.range_year:
+    #                 temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
+    #             list_image.append(temp_list_image)
+    #             del temp_list_image
+    #             gc.collect()
+    #         for i in range(len(list_image)):
+    #             list_image[i]=np.concatenate(list_image[i],axis=0)
+    #             temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
+    #             temp_path="/".join(temp_path.split('/')[:4])
+    #             cv2.imwrite(f"{temp_path}/{2011+i}.png",list_image[i])
+    #         # final_image=np.concatenate(list_image,axis=1)
+    #         # temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
+    #         # temp_path="/".join(temp_path.split('/')[:4])
+    #         # print(f"{temp_path}/summary_preview.png")
+    #         # cv2.imwrite(f"{temp_path}/summary_preview.png",final_image)
+    #         # del list_image, final_image
+    #         del list_image
+    #         gc.collect()
 
-    def save_png_split(self):
-        for data_keyword in ['case','death']:
-            for type_keyword in self.list_type_keyword:
-                self._save_png_split_one(data_keyword=data_keyword,type_keyword=type_keyword,range_year=self.range_year)
+    # def save_png_split(self):
+    #     for data_keyword in ['case','death']:
+    #         for type_keyword in self.list_type_keyword:
+    #             self._save_png_split_one(data_keyword=data_keyword,type_keyword=type_keyword,range_year=self.range_year)
 
-    def _save_png_split_one(self,data_keyword,type_keyword,range_year):
-        temp_list_image=[]
-        for year in tqdm(range_year,desc=f"Process Summarize {data_keyword} {type_keyword}"):
-            temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
-        temp_img1=np.concatenate(temp_list_image[0:5],axis=1)
-        temp_img2=np.concatenate(temp_list_image[5:],axis=1)
-        del temp_list_image
-        gc.collect()
-        img=np.concatenate((temp_img1,temp_img2),axis=0)
-        print(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year))
-        temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
-        temp_path="/".join(temp_path.split('/')[:5])
-        cv2.imwrite(f"{temp_path}/summary.png",img)
-        del img
-        gc.collect()
+    # def _save_png_split_one(self,data_keyword,type_keyword,range_year):
+    #     temp_list_image=[]
+    #     for year in tqdm(range_year,desc=f"Process Summarize {data_keyword} {type_keyword}"):
+    #         temp_list_image.append(cv2.imread(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)))
+    #     temp_img1=np.concatenate(temp_list_image[0:5],axis=1)
+    #     temp_img2=np.concatenate(temp_list_image[5:],axis=1)
+    #     del temp_list_image
+    #     gc.collect()
+    #     img=np.concatenate((temp_img1,temp_img2),axis=0)
+    #     print(self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year))
+    #     temp_path=self.path.format(self.plot_obj.data.base_output_path,data_keyword,type_keyword,year)
+    #     temp_path="/".join(temp_path.split('/')[:5])
+    #     cv2.imwrite(f"{temp_path}/summary.png",img)
+    #     del img
+    #     gc.collect()
 
     def _create_vert_label(self,img_arr,img_width,text,font):
         
@@ -78,7 +79,7 @@ class SummaryDistPlot:
 
         return copy_img_arr
 
-    def _create_custom_legend(self,max_value,keyword,gamma):
+    def _create_custom_legend_one(self,max_value,keyword,gamma):
         f,ax=plt.subplots(1,figsize=(9,12))
         ax.remove()
         cax = f.add_axes([0.2, 0.08, 1, 0.01]) #[left, bottom, width, height]
@@ -92,20 +93,28 @@ class SummaryDistPlot:
         # lgd=f.colorbar(sm, cax=cax,orientation="horizontal").set_label(f"Number of {keyword} (person)", rotation=0, labelpad=0.5)
         # lgd=f.colorbar(sm, cax=cax,orientation="horizontal")
         plt.xticks(rotation=30)
-        plt.savefig('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/distribution/{keyword}"),dpi=2400,bbox_inches='tight')
+        plt.savefig('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{keyword}"),dpi=2400,bbox_inches='tight')
 
         plt.close('all')
+
+    def _create_custom_legend(self,data_keyword):
+        if data_keyword=='case':
+            self._create_custom_legend_one(self.plot_obj.data.case_max_value,data_keyword,self.plot_obj.gamma[0])
+        else:
+            self._create_custom_legend_one(self.plot_obj.data.death_max_value,data_keyword,self.plot_obj.gamma[1])
 
     def save_png_horizontal(self):
         # 1568 * 2832 each
         font = ImageFont.truetype("fonts/times.ttf", 256)
 
-        for data_keyword in tqdm(['case','death'],desc="summary png horizontal"):
+        for data_keyword in tqdm(['case','death'],desc=f"summary {self.summary_keyword} png horizontal"):
 
-            if data_keyword=='case':
-                self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword,self.plot_obj.gamma[0])
-            else:
-                self._create_custom_legend(self.plot_obj.data.death_max_value,data_keyword,self.plot_obj.gamma[1])
+            # if data_keyword=='case':
+            #     self._create_custom_legend(self.plot_obj.data.case_max_value,data_keyword,self.plot_obj.gamma[0])
+            # else:
+            #     self._create_custom_legend(self.plot_obj.data.death_max_value,data_keyword,self.plot_obj.gamma[1])
+
+            self._create_custom_legend(data_keyword)
 
             img_arr=img_arr2=img_arr3=year_img_arr=[]
 
@@ -117,8 +126,8 @@ class SummaryDistPlot:
             year_img_arr.append(img)
             del img
 
-            legend_img=Image.open('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}"))
-            print(legend_img.size)
+            legend_img=Image.open('{}/label.png'.format(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{data_keyword}"))
+            # print(legend_img.size)
             legend_new_size=(16680,int(legend_img.size[1]/legend_img.size[0]*16680))
             legend_img=legend_img.resize(legend_new_size)
             legend_img=legend_img.convert("RGB")
@@ -133,15 +142,15 @@ class SummaryDistPlot:
                 year_img_arr.append(img)
                 del img
                 
-                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DF/{year}.png")
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{data_keyword}/DF/{year}.png")
                 img_arr.append(img)
                 del img
 
-                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DHF/{year}.png")
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{data_keyword}/DHF/{year}.png")
                 img_arr2.append(img)
                 del img
 
-                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/DSS/{year}.png")
+                img=cv2.imread(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{data_keyword}/DSS/{year}.png")
                 img_arr3.append(img)
 
                 del img
@@ -151,10 +160,10 @@ class SummaryDistPlot:
             img_dhf=np.concatenate(img_arr2,axis=1)
             img_dss=np.concatenate(img_arr3,axis=1)
 
-            print(img_yearly.shape,img_df.shape,img_dhf.shape,img_dss.shape,legend_img.shape)
+            # print(img_yearly.shape,img_df.shape,img_dhf.shape,img_dss.shape,legend_img.shape)
 
             img_final=np.concatenate([img_yearly,img_df,img_dhf,img_dss,legend_img],axis=0)
-            cv2.imwrite(f"{self.plot_obj.data.base_output_path}/distribution/{data_keyword}/three_disease_horz.png",img_final)
+            cv2.imwrite(f"{self.plot_obj.data.base_output_path}/{self.summary_keyword}/{data_keyword}/three_disease_horz.png",img_final)
 
             del img_df, img_dhf, img_dss, img_final, img_arr, img_arr2, img_arr3, legend_img
             gc.collect()

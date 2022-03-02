@@ -256,9 +256,9 @@ class GStarPlot(BasePlot):
             hmap=colors.ListedColormap(color_list)
             color_labels=[color_list[::-1][i] for i in hotcoldspot]
 
-            y.assign(cl=labels).assign(spot=hotcoldspot).plot(column='cl',categorical=True,linewidth=0.1,ax=ax,edgecolor='white',cmap=hmap,k=7,categories=spots[::-1],legend=True)
+            y.assign(cl=labels).assign(spot=hotcoldspot).plot(column='cl',categorical=True,linewidth=2,ax=ax,edgecolor='black',cmap=hmap,k=7,categories=spots[::-1],legend=False)
             ax.set_axis_off()
-            plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+            # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
 
             del gistar_local,hotspot90,hotspot95,hotspot99,notsig,coldspot90,coldspot95,coldspot99,hotcoldspot,labels,map_with_data,y
             gc.collect()
