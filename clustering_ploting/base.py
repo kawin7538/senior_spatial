@@ -246,6 +246,7 @@ class BasePlot:
                     try:
                         self._make_local_cluster_plot(year,data_keyword,type_keyword,self.data.list_type_keyword.index(type_keyword))
                         plt.savefig(self.path.format(self.data.base_output_path,data_keyword,type_keyword,year),dpi=300,bbox_inches=bbox_inches)
+                        plt.close('all')
                     except:
                         print(f"{self.keyword} in {data_keyword} {type_keyword} year {year} error, skipped it")
                         continue;
@@ -273,3 +274,4 @@ class BasePlot:
         '''
         self._make_local_cluster_plot(2011,'case','DF',self.data.list_type_keyword.index('DF'))
         plt.savefig("plot_preview.png",dpi=300,bbox_inches=bbox_inches)
+        plt.close('all')

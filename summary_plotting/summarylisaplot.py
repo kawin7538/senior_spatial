@@ -3,16 +3,16 @@ from clustering_ploting.base import BasePlot
 from summary_plotting.summarydistplot import SummaryDistPlot
 import matplotlib.pyplot as plt
 
-class SummaryGStarPlot(SummaryDistPlot):
+class SummaryLisaPlot(SummaryDistPlot):
     def __init__(self, plot_obj: BasePlot):
-        super(SummaryGStarPlot,self).__init__(plot_obj)
-        self.summary_keyword='gstar'
+        super(SummaryLisaPlot,self).__init__(plot_obj)
+        self.summary_keyword='moran'
 
     def _create_custom_legend(self, data_keyword):
-        colors = ['red','blue','white',(1,0.3,0.3),(0.3,0.3,1),'lightgrey',(1,0.6,0.6),(0.6,0.6,1),'white']
+        colors = ['#d7191c','#abd9e9','#fdae61','#2c7bb6','lightgrey','white']
         f = lambda m,c: plt.plot([],[],marker=m, color=c, markersize=11, ls="none")[0]
-        handles = [f("o", colors[i]) for i in range(9)]
-        labels = ['Hot Spot - 99% Confidence','Cold Spot - 99% Confidence',' ','Hot Spot - 95% Confidence','Cold Spot - 95% Confidence','not-significant','Hot Spot - 90% Confidence','Cold Spot - 90% Confidence',' ']
+        handles = [f("o", colors[i]) for i in range(6)]
+        labels = ['High - with High surrounded','Low - with High surrounded','High - with Low surrounded','Low - with Low surrounded','not-significant','']
         plt.axis('off')
         legend = plt.legend(handles, labels, loc=3, framealpha=1, frameon=True ,ncol=3)
 

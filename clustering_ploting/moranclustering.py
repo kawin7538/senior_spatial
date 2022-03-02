@@ -109,7 +109,7 @@ class LISAPlot(BasePlot):
     def __init__(self, cluster: BaseCluster) -> None:
         super().__init__(cluster)
         self.keyword="LISA Plot"
-        self.path="{}/moran/{}/{}/LISA_{}.png"
+        self.path="{}/moran/{}/{}/{}.png"
     
     def _make_local_cluster_plot(self, year: int, data_keyword, type_keyword, idx):
         fig,ax=plt.subplots(1,figsize=(9,12))
@@ -120,10 +120,11 @@ class LISAPlot(BasePlot):
         moran_local=pickle.load(file)
         file.close()
 
-        lisa_cluster(moran_local,y,ax=ax,p=self.cluster.p_value)
+        lisa_cluster(moran_local,y,ax=ax,p=self.cluster.p_value,legend=False)
+        self.data.get_map().boundary.plot(ax=ax,edgecolor='black',linewidth=2)
         ax.set_axis_off()
 
-        plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
+        # plt.title('{} {} {} {} {}'.format('ratio' if self.data.load_ratio else 'raw',data_keyword,type_keyword,self.keyword,year))
 
         del moran_local,map_with_data,y
         gc.collect()
