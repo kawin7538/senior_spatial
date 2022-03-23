@@ -24,10 +24,12 @@ class TestPlayCase:
         print("Running Testcase with full_precision =", full_precision)
         self.full_precision = full_precision
         self.startwith100 = startwith100
+        self.input_path="testcase_modules/testcase_input"
+        self.output_path="output/testcase_output"
         self.list_file_name = sorted(set([i for i in os.listdir(
-            "testcase_modules/testcase_input")]), key=lambda x: int(x.split('.')[0]) % 100)
-        self._check_count_files()
-        self._play_case()
+            self.input_path)]), key=lambda x: int(x.split('.')[0]) % 100)
+        # self._check_count_files()
+        # self._play_case()
 
     def _check_count_files(self):
         number_files = len(self.list_file_name)
@@ -44,7 +46,7 @@ class TestPlayCase:
         for precision in list_precision:
             for file_name in tqdm(sorted(self.list_file_name), desc=f"Precision{precision}"):
                 input_value = self._read_file(
-                    "testcase_modules/testcase_input", file_name)
+                    self.input_path, file_name)
                 num_layer, selected_layer, selected_name = input_value[0][:-1]
                 geopackage_obj = TestGEOPackage(
                     num_layer, selected_layer, selected_name)
@@ -52,7 +54,7 @@ class TestPlayCase:
                 dataloading_obj = TestDataLoading(
                     geopackage_obj, input_value[1], precision)
                 dataloading_obj.to_csv(os.path.join(
-                    "output/testcase_output", file_name.split('.')[0]+f"_precision{precision}"+".csv"))
+                    self.output_path, file_name.split('.')[0]+f"_precision{precision}"+".csv"))
 
                 file_name = file_name.split('.')[0]+f"_precision{precision}"
                 self._plot_dist(dataloading_obj, file_name)
@@ -89,7 +91,7 @@ class TestPlayCase:
         temp_map_with_data.boundary.plot(ax=ax, color='Black', linewidth=.4)
         temp_map_with_data.plot(ax=ax, cmap='Pastel2')
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".name.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -97,7 +99,7 @@ class TestPlayCase:
         fig, ax = plt.subplots(1, figsize=(12, 12))
         plot_spatial_weights(geopackage_obj.w, geopackage_obj.map, ax=ax)
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".weight.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -106,7 +108,7 @@ class TestPlayCase:
         dataloading_obj.map_with_data.plot(
             column='value', legend=True, cmap='Oranges', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax)
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".dist.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -117,7 +119,7 @@ class TestPlayCase:
         global_g_df.loc[len(global_g_df)] = [G_global.G,
                                              G_global.z_sim, G_global.p_z_sim]
         global_g_df.to_csv(os.path.join(
-            "output/testcase_output", file_name.split('.')[0]+".g.global.csv"), index=False)
+            self.output_path, file_name.split('.')[0]+".g.global.csv"), index=False)
 
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), star=False, transform="B", permutations=999)
@@ -145,12 +147,12 @@ class TestPlayCase:
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
         dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.Zs, gistar_p_value=gistar_local.p_sim, cl=labels)[
-            [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".gi.csv"), index=False)
+            [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join(self.output_path, file_name.split('.')[0]+".gi.csv"), index=False)
         dataloading_obj.map_with_data.assign(cl=labels).assign(spot=hotcoldspot).plot(
             column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='white', cmap=hmap, k=7, categories=spots[::-1], legend=True)
 
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output",
+        plt.savefig(os.path.join(self.output_path,
                     file_name.split('.')[0]+".gi.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -159,7 +161,7 @@ class TestPlayCase:
         # G_global=G(dataloading_obj.map_with_data['value'],geopackage_obj.get_weight(),permutations=9999)
         # global_g_df=pd.DataFrame(columns=['G','G_z_sim','p_z_sim'])
         # global_g_df.loc[len(global_g_df)]=[G_global.G, G_global.z_sim,G_global.p_z_sim]
-        # global_g_df.to_csv(os.path.join("output/testcase_output",file_name.split('.')[0]+".g_global.csv"),index=False)
+        # global_g_df.to_csv(os.path.join(self.output_path,file_name.split('.')[0]+".g_global.csv"),index=False)
 
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), star=True, transform="B", permutations=999)
@@ -187,12 +189,12 @@ class TestPlayCase:
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
         dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.Zs, gistar_p_value=gistar_local.p_sim, cl=labels)[
-            [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".gistar.csv"), index=False)
+            [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join(self.output_path, file_name.split('.')[0]+".gistar.csv"), index=False)
         dataloading_obj.map_with_data.assign(cl=labels).assign(spot=hotcoldspot).plot(
             column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='white', cmap=hmap, k=7, categories=spots[::-1], legend=True)
 
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".gistar.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -205,19 +207,19 @@ class TestPlayCase:
         global_moran_df.loc[len(global_moran_df)] = [
             moran_global.I, moran_global.z_sim, moran_global.p_sim]
         global_moran_df.to_csv(os.path.join(
-            "output/testcase_output", file_name.split('.')[0]+".moran.global.csv"), index=False)
+            self.output_path, file_name.split('.')[0]+".moran.global.csv"), index=False)
 
         moran_local = Moran_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), transformation="B", permutations=999)
         temp_result = dataloading_obj.map_with_data.assign(
             moran_value=moran_local.Is, moran_z_sim=moran_local.z_sim, moran_p_sim_value=moran_local.p_sim, cl=mask_local_auto(moran_local, p=0.1)[3])
         temp_result[[f'NAME_{dataloading_obj.num_layer}', 'moran_value', 'moran_z_sim', 'moran_p_sim_value', 'cl']].round(
-            4).to_csv(os.path.join("output/testcase_output", file_name.split('.')[0]+".lisa.csv"), index=False)
+            4).to_csv(os.path.join(self.output_path, file_name.split('.')[0]+".lisa.csv"), index=False)
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
         lisa_cluster(moran_local, dataloading_obj.map_with_data, ax=ax, p=0.1)
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".lisa.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
@@ -226,7 +228,7 @@ class TestPlayCase:
             moran_scatterplot(moran_local, p=0.1, ax=ax,
                               scatter_kwds={'s': 500})
             ax.set_axis_off()
-            plt.savefig(os.path.join("output/testcase_output", file_name.split('.')
+            plt.savefig(os.path.join(self.output_path, file_name.split('.')
                         [0]+".moran.scatter.png"), dpi=300, bbox_inches='tight')
             plt.close('all')
         except:
@@ -239,7 +241,7 @@ class TestPlayCase:
         global_c_df.loc[len(global_c_df)] = [c_global.C,
                                              c_global.z_sim, c_global.p_z_sim]
         global_c_df.to_csv(os.path.join(
-            "output/testcase_output", file_name.split('.')[0]+".c.global.csv"), index=False)
+            self.output_path, file_name.split('.')[0]+".c.global.csv"), index=False)
 
         c_local = Geary_Local(geopackage_obj.get_weight(
         ), labels=True, sig=0.1, permutations=999, keep_simulations=False)
@@ -252,7 +254,7 @@ class TestPlayCase:
         local_c_df['c_label'] = list(c_local.labs)
         local_c_df['c_label'] = local_c_df['c_label'].astype(int).replace(
             {1: 'outlier', 2: 'cluster', 3: 'other', 4: 'not-significant'})
-        local_c_df.to_csv(os.path.join("output/testcase_output",
+        local_c_df.to_csv(os.path.join(self.output_path,
                           file_name.split('.')[0]+".c.local.csv"), index=False)
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
@@ -262,6 +264,6 @@ class TestPlayCase:
         geopackage_obj.map.assign(c_label=local_c_df['c_label']).plot(
             column='c_label', categorical=True, linewidth=1, ax=ax, edgecolor='black', legend=True, cmap=hmap, k=4, categories=spots[::-1])
         ax.set_axis_off()
-        plt.savefig(os.path.join("output/testcase_output",
+        plt.savefig(os.path.join(self.output_path,
                     file_name.split('.')[0]+".c.png"), dpi=300, bbox_inches='tight')
         plt.close('all')

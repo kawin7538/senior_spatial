@@ -13,7 +13,10 @@ class TestDataLoading:
 
     def _insert_data(self, geopackagedata, list_value):
         temp_map = geopackagedata.get_map()
-        temp_map['value'] = list_value
+        if isinstance(list_value,pd.DataFrame):
+            temp_map['value']=list_value['val']
+        else:
+            temp_map['value'] = list_value
         return temp_map
 
     def _generate_from_centroid(self, keyword, list_centroid):
@@ -196,6 +199,8 @@ class TestDataLoading:
         return [*map(dict_value.get, list_classification)]
 
     def _generate_value(self, list_value, list_centroid):
+        if isinstance(list_value,pd.DataFrame):
+            return list_value
         ans_list = []
         if len(list_value) == 1:
             if list_value[0]=='real':
@@ -231,4 +236,4 @@ class TestDataLoading:
 
     def to_csv(self, filename):
         temp_df = self.map_with_data[[f'NAME_{self.num_layer}', 'value']]
-        temp_df.to_csv(filename)
+        temp_df.to_csv(filename,index=False)

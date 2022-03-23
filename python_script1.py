@@ -92,27 +92,25 @@ if __name__ == '__main__':
     # plot_obj=GStarPlot(cluster_obj)
     # plot_obj.plot_preview(bbox_inches='tight')
     # plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
+    # SummaryGStarPlot(plot_obj).save_png_horizontal()
     # plot_obj=GStarVPlot(cluster_obj)
     # plot_obj.save_local_cluster_plot_png()
-
-    # SummaryGStarPlot(plot_obj).save_png_horizontal()
 
     # del cluster_obj,plot_obj
     # gc.collect()
 
     cluster_obj=MoranCluster(data,100000,p_value=0.05)
-    # cluster_obj.save_global_cluster_csv()
-    # cluster_obj.save_local_cluster_csv()
+    cluster_obj.save_global_cluster_csv()
+    cluster_obj.save_local_cluster_csv()
     plot_obj=LISAPlot(cluster_obj)
     # plot_obj.plot_preview(bbox_inches='tight')
     plot_obj.save_local_cluster_plot_png(bbox_inches='tight')
-    # plot_obj=LISAVPlot(cluster_obj)
-    # plot_obj.save_local_cluster_plot_png()
-    # plot_obj=MoranLocalScatterPlot(cluster_obj)
-    # # plot_obj.plot_preview()
-    # plot_obj.save_local_cluster_plot_png()
-
     SummaryLisaPlot(plot_obj).save_png_horizontal()
+    plot_obj=LISAVPlot(cluster_obj)
+    plot_obj.save_local_cluster_plot_png()
+    plot_obj=MoranLocalScatterPlot(cluster_obj)
+    # plot_obj.plot_preview()
+    plot_obj.save_local_cluster_plot_png()
 
     del cluster_obj,plot_obj
     gc.collect()
