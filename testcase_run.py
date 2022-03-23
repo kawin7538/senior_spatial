@@ -7,4 +7,5 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
 
     # TestPlayCase(full_precision=False,startwith100=True)
-    TestPlayCase2().play_case()
+    tester=TestPlayCase2()
+    tester.simulate_case()
