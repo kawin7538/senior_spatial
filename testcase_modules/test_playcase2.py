@@ -115,9 +115,9 @@ class TestPlayCase2(TestPlayCase):
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), star=True, transform="B", permutations=999)
 
-        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim < 0.05)
-        notsig = (gistar_local.p_sim >= 0.05)
-        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim < 0.05)
+        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.05)
+        notsig = (gistar_local.p_sim > 0.05)
+        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.05)
         hotcoldspot = hotspot95*1+coldspot95*2
         spots = ['not-significant', 'hotspot','coldspot']
         labels = [spots[i] for i in hotcoldspot]

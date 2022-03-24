@@ -45,3 +45,15 @@ High value clusters at the west-central of Thailand
 
 - ```m3.json```<br>
 Similarly as m2, but 1 province was added as high value.
+
+- ```m4.json```<br>
+Higher at northern, last of southern, and southeast of northeastern, 2013- and 2019-like pattern, with incidence at southern
+
+- ```m5.json```<br>
+Thailand flag-like pattern, a province at higher value group is lower value one.
+
+- ```m6.json```<br>
+Higher at Petchbun, with lower of neighbors. include some incidence at some border.
+
+- ```m7.json```<br>
+Barcode-like pattern at southern, adapted from Testcase 1 from the old version.
