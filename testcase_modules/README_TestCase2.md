@@ -24,6 +24,9 @@ Clustering results for all 100-replicate retrived from GiStar procedure, with mo
 - ```.gistar.png```<br>
 Visualize of GiStar colorize with most occurrence results.
 
+- ```.gistar.metrics.csv```<br>
+Evaluation metrics in provincial level from GiStar for each replicate
+
 - ```.localmoran.csv```<br>
 Clustering results for all 100-replicate retrived from Local Moran procedure, with most_cl means most cl type with voting procedure (mode), 5 labels: ns, HH, LH, HL, LL. These are considered at $\alpha$=0.05
 
