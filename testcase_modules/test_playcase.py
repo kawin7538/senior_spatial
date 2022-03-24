@@ -108,8 +108,9 @@ class TestPlayCase:
         dataloading_obj.map_with_data.plot(
             column='value', legend=True, cmap='Oranges', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax)
         ax.set_axis_off()
-        plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".dist.png"), dpi=300, bbox_inches='tight')
+        # plt.savefig(os.path.join(self.output_path, file_name.split('.')
+        #             [0]+".dist.png"), dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.output_path, file_name+".dist.png"), dpi=300, bbox_inches='tight')
         plt.close('all')
 
     def _plot_local_gi(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage, file_name):
