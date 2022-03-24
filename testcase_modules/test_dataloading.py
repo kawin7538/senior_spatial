@@ -14,6 +14,7 @@ class TestDataLoading:
     def _insert_data(self, geopackagedata, list_value):
         temp_map = geopackagedata.get_map()
         if isinstance(list_value,pd.DataFrame):
+            # print(list_value)
             temp_map['value']=list_value['total']
         else:
             temp_map['value'] = list_value

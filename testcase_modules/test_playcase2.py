@@ -36,7 +36,7 @@ class TestPlayCase2(TestPlayCase):
             dataloading_obj=TestDataLoading(geopackage_obj,input_df,100)
             self._plot_exp_dist(dataloading_obj,f"{file_name.split('.')[0]}")
 
-            dataloading_obj=TestDataLoading2(input_df,n_sim=100)
+            dataloading_obj=TestDataLoading2(input_df,n_sim=self.n_sim)
             dataloading_obj.to_csv(f"{self.output_simdf_path}/{file_name.split('.')[0]}")
 
             # file_name = file_name.split('.')[0]
@@ -60,6 +60,8 @@ class TestPlayCase2(TestPlayCase):
             temp_file_name="".join(file_name.split(".")[0])
 
             self._plot_mean_dist(dataloading_obj, temp_file_name)
+            self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
+            self._plot_local_gistar(geopackage_obj,temp_file_name)
 
             del input_df, temp_input_df, dataloading_obj, temp_file_name
             gc.collect()
@@ -90,37 +92,50 @@ class TestPlayCase2(TestPlayCase):
         plt.savefig(os.path.join(self.output_path, file_name+".mean_dist.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
-    def _plot_local_gistar(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage, file_name):
-
+    def _action_local_gistar(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
+        temp_list_df=[]
+        for i in tqdm(range(self.n_sim),desc="Action Local GiStar",leave=False):
+            temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
+            dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
+            temp_list_df.append(self._action_local_gistar_one(dataloading_obj,geopackage_obj).rename(columns={'cl':f'cl_{i+1}'}))
+        gistar_df=pd.concat(temp_list_df,axis=1)
+        # print(gistar_df.apply(pd.Series.value_counts,axis=1))
+        gistar_df['most_cl']=gistar_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
+        gistar_df=gistar_df.reset_index()
+        gistar_df.to_csv(os.path.join(self.output_path,file_name+".gistar.csv"),index=False)
+        
+        del temp_list_df,gistar_df,temp_input_df,dataloading_obj
+        gc.collect()
+        
+    def _action_local_gistar_one(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage):
         gistar_local = G_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
         ), star=True, transform="B", permutations=999)
 
-        hotspot90 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.1)
-        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.05)
-        hotspot99 = (gistar_local.Zs > 0) & (gistar_local.p_sim <= 0.01)
-        hotspot90 = hotspot90 & ~hotspot95
-        hotspot95 = hotspot95 & ~hotspot99
-        notsig = (gistar_local.p_sim > 0.1)
-        coldspot90 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.1)
-        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.05)
-        coldspot99 = (gistar_local.Zs < 0) & (gistar_local.p_sim <= 0.01)
-        coldspot90 = coldspot90 & ~coldspot95
-        coldspot95 = coldspot95 & ~coldspot99
-        hotcoldspot = hotspot99*1+hotspot95*2+hotspot90 * \
-            3+coldspot90*4+coldspot95*5+coldspot99*6
-        spots = ['not-significant', 'hotspot-0.01', 'hotspot-0.05',
-                 'hotspot-0.1', 'coldspot-0.1', 'coldspot-0.05', 'coldspot-0.01']
+        hotspot95 = (gistar_local.Zs > 0) & (gistar_local.p_sim < 0.05)
+        notsig = (gistar_local.p_sim >= 0.05)
+        coldspot95 = (gistar_local.Zs < 0) & (gistar_local.p_sim < 0.05)
+        hotcoldspot = hotspot95*1+coldspot95*2
+        spots = ['not-significant', 'hotspot','coldspot']
         labels = [spots[i] for i in hotcoldspot]
-        color_list = ['lightgrey', 'red',
-                      (1, 0.3, 0.3), (1, 0.6, 0.6), (0.6, 0.6, 1), (0.3, 0.3, 1), 'blue'][::-1]
+        return dataloading_obj.map_with_data[['NAME_1']].assign(cl=labels).set_index('NAME_1')
+
+    def _plot_local_gistar(self, geopackage_obj: TestGEOPackage, file_name):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".gi.csv"))[['NAME_1','most_cl']]
+        color_list = ['lightgrey', 'red', 'blue'][::-1]
+        spots = ['not-significant', 'hotspot','coldspot']
         hmap = colors.ListedColormap(color_list)
+        hotcoldspot=input_df['most_cl'].map({
+            'not-significant':0,
+            'hotspot':1,
+            'coldspot':2
+        }).values
         color_labels = [color_list[::-1][i] for i in hotcoldspot]
+        dataloading_obj=TestDataLoading(geopackage_obj,input_df.rename(columns={'most_cl':'total'}),100)
 
         fig, ax = plt.subplots(1, figsize=(12, 12))
-        dataloading_obj.map_with_data.assign(gistar_Z=gistar_local.Zs, gistar_p_value=gistar_local.p_sim, cl=labels)[
-            [f'NAME_{dataloading_obj.num_layer}', 'gistar_Z', 'gistar_p_value', 'cl']].round(4).to_csv(os.path.join(self.output_path, file_name.split('.')[0]+".gistar.csv"), index=False)
-        dataloading_obj.map_with_data.assign(cl=labels).assign(spot=hotcoldspot).plot(
-            column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='white', cmap=hmap, k=7, categories=spots[::-1], legend=True)
+
+        dataloading_obj.map_with_data.assign(spot=hotcoldspot,cl=input_df['most_cl']).plot(
+            column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='black', cmap=hmap, k=3, categories=spots[::-1], legend=True)
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
