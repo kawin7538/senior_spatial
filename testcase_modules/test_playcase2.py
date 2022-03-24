@@ -6,6 +6,8 @@ import pandas as pd
 
 from tqdm import tqdm
 from esda.getisord import G, G_Local
+from esda.moran import Moran, Moran_Local
+from splot._viz_utils import mask_local_auto
 from testcase_modules.test_dataloading import TestDataLoading
 from testcase_modules.test_dataloading2 import TestDataLoading2
 from testcase_modules.test_geopackage import TestGEOPackage
@@ -51,7 +53,7 @@ class TestPlayCase2(TestPlayCase):
 
     def action_case(self):
         geopackage_obj=TestGEOPackage(1,1,"Thailand")
-        for file_name in tqdm(os.listdir(self.output_simdf_path),desc="Actioning Case"):
+        for file_name in tqdm(sorted(os.listdir(self.output_simdf_path)),desc="Actioning Case"):
             input_df=pd.read_csv(os.path.join(self.output_simdf_path,file_name))
             temp_input_df=input_df[['NAME_1']].copy()
             temp_input_df['total']=input_df.set_index("NAME_1").mean(axis=1).values
@@ -62,6 +64,8 @@ class TestPlayCase2(TestPlayCase):
             self._plot_mean_dist(dataloading_obj, temp_file_name)
             self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
             self._plot_local_gistar(geopackage_obj,temp_file_name)
+            self._action_local_moran(input_df,geopackage_obj,temp_file_name)
+            self._plot_local_moran(geopackage_obj,temp_file_name)
 
             del input_df, temp_input_df, dataloading_obj, temp_file_name
             gc.collect()
@@ -120,7 +124,7 @@ class TestPlayCase2(TestPlayCase):
         return dataloading_obj.map_with_data[['NAME_1']].assign(cl=labels).set_index('NAME_1')
 
     def _plot_local_gistar(self, geopackage_obj: TestGEOPackage, file_name):
-        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".gi.csv"))[['NAME_1','most_cl']]
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".gistar.csv"))[['NAME_1','most_cl']]
         color_list = ['lightgrey', 'red', 'blue'][::-1]
         spots = ['not-significant', 'hotspot','coldspot']
         hmap = colors.ListedColormap(color_list)
@@ -140,4 +144,49 @@ class TestPlayCase2(TestPlayCase):
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
                     [0]+".gistar.png"), dpi=300, bbox_inches='tight')
+        plt.close('all')
+
+    def _action_local_moran(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
+        temp_list_df=[]
+        for i in tqdm(range(self.n_sim),desc="Action Local Moran",leave=False):
+            temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
+            dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
+            temp_list_df.append(self._action_local_moran_one(dataloading_obj,geopackage_obj).rename(columns={'cl':f'cl_{i+1}'}))
+        localmoran_df=pd.concat(temp_list_df,axis=1)
+        # print(gistar_df.apply(pd.Series.value_counts,axis=1))
+        localmoran_df['most_cl']=localmoran_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
+        localmoran_df=localmoran_df.reset_index()
+        localmoran_df.to_csv(os.path.join(self.output_path,file_name+".localmoran.csv"),index=False)
+        
+        del temp_list_df,localmoran_df,temp_input_df,dataloading_obj
+        gc.collect()
+
+    def _action_local_moran_one(self, dataloading_obj: TestDataLoading, geopackage_obj: TestGEOPackage):
+        moran_local = Moran_Local(dataloading_obj.map_with_data['value'], geopackage_obj.get_weight(
+        ), transformation="B", permutations=999)
+        return dataloading_obj.map_with_data[['NAME_1']].assign(cl=mask_local_auto(moran_local, p=0.05)[3]).set_index('NAME_1')
+
+    def _plot_local_moran(self, geopackage_obj: TestGEOPackage, file_name):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".localmoran.csv"))[['NAME_1','most_cl']]
+        color_list = ['red', 'darkturquoise', 'orange', 'blue','lightgrey']
+        spots = ['HH','LH','HL','LL','ns'][::-1]
+        hmap = colors.ListedColormap(color_list)
+        hotcoldspot=input_df['most_cl'].map({
+            'HH':0,
+            'LH':1,
+            'HL':2,
+            'LL':3,
+            'ns':4
+        }).values
+        color_labels = [color_list[i] for i in hotcoldspot]
+        dataloading_obj=TestDataLoading(geopackage_obj,input_df.rename(columns={'most_cl':'total'}),100)
+
+        fig, ax = plt.subplots(1, figsize=(12, 12))
+
+        dataloading_obj.map_with_data.assign(spot=hotcoldspot,cl=input_df['most_cl']).plot(
+            column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='black', cmap=hmap, k=5, categories=spots[::-1], legend=True)
+
+        ax.set_axis_off()
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
+                    [0]+".localmoran.png"), dpi=300, bbox_inches='tight')
         plt.close('all')

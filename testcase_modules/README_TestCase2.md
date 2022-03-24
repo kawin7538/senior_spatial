@@ -18,8 +18,17 @@ Create directly from .json file, expected pattern
 - ```.mean_dist.png```<br>
 plot using average value of 100-replicate-poisson randomization
 
-- ```.gi.csv```<br>
-Clustering results for all 100-replicate retrived from GiStar procedure, with most_cl means most cl type with voting procedure (mode), 3 labels: not-significant, hotspot, coldspot, these are considered at $\alpha$=0.05
+- ```.gistar.csv```<br>
+Clustering results for all 100-replicate retrived from GiStar procedure, with most_cl means most cl type with voting procedure (mode), 3 labels: not-significant, hotspot, coldspot. These are considered at $\alpha$=0.05
+
+- ```.gistar.png```<br>
+Visualize of GiStar colorize with most occurrence results.
+
+- ```.localmoran.csv```<br>
+Clustering results for all 100-replicate retrived from Local Moran procedure, with most_cl means most cl type with voting procedure (mode), 5 labels: ns, HH, LH, HL, LL. These are considered at $\alpha$=0.05
+
+- ```.localmoran.png```<br>
+Visualize of Local Moran colorize with most occurrence results.
 
 ## Description in each ```.json``` files (original testcases)
 
@@ -33,3 +42,6 @@ Base case, neither higher nor lower
 
 - ```m2.json```<br>
 High value clusters at the west-central of Thailand
+
+- ```m3.json```<br>
+Similarly as m2, but 1 province was added as high value.
