@@ -27,6 +27,15 @@ Visualize of GiStar colorize with most occurrence results.
 - ```.gistar.metrics.csv```<br>
 Evaluation metrics in provincial level from GiStar for each replicate
 
+- ```.gistar.metrics.precision.png```<br>
+Plot of precision segregated with hotspot(red) and coldspot(blue)
+
+- ```.gistar.metrics.recall.png```<br>
+Plot of recall segregated with hotspot(red) and coldspot(blue)
+
+- ```.gistar.metrics.accuracy.png```<br>
+Plot of accuracy from GiStar procedure
+
 - ```.localmoran.csv```<br>
 Clustering results for all 100-replicate retrived from Local Moran procedure, with most_cl means most cl type with voting procedure (mode), 5 labels: ns, HH, LH, HL, LL. These are considered at $\alpha$=0.05
 

@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
+import geoplot
 from esda.getisord import G, G_Local
 from esda.moran import Moran, Moran_Local
 from splot._viz_utils import mask_local_auto
@@ -194,11 +195,12 @@ class TestPlayCase2(TestPlayCase):
 
     def evaluate_case(self):
         geopackage_obj=TestGEOPackage(1,1,"Thailand")
-        for file_name in tqdm(self.list_file_name,desc="Evaluating Case",leave=False):
+        for file_name in tqdm(self.list_file_name,desc="Evaluating Case",leave=True):
             temp_file_name=file_name.split('.')[0]
             # input_df=pd.read_json(os.path.join(self.input_path,file_name))
             true_df=self._read_file(self.input_path,file_name)
             self._evaluate_local_gistar(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
             # break;
 
     def _evaluate_local_gistar(self,true_df,temp_file_name):
@@ -222,3 +224,33 @@ class TestPlayCase2(TestPlayCase):
                     metrics_dict['coldspot']['recall'],
                     accuracy_score(np.array([y_true[i]]*self.n_sim),y_pred[i]))
         metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.gistar.metrics.csv'),index=False)
+
+    def _plot_evaluate_local_gistar(self,geopackage_obj:TestGEOPackage,temp_file_name):
+        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.gistar.metrics.csv'))
+        temp_map_with_data=geopackage_obj.get_map()
+        # temp_map_with_data[['hotspot_precision','hotspot_recall','coldspot_precision','coldspot_recall','accuracy']]=metrics_df[['hotspot_precision','hotspot_recall','coldspot_precision','coldspot_recall','accuracy']].values
+        # ax=geoplot.polyplot(temp_map_with_data)
+        # geoplot.kdeplot(temp_map_with_data['hotspot_precision'])
+        # geoplot.kdeplot(temp_map_with_data.assign(hotspot_precision=metrics_df['hotspot_precision']))
+        fig, ax = plt.subplots(1, figsize=(12, 12))
+        temp_map_with_data.assign(hotspot_precision=metrics_df['hotspot_precision'].values).plot(ax=ax,column='hotspot_precision',cmap="Reds",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+        temp_map_with_data.assign(coldspot_precision=metrics_df['coldspot_precision'].values).plot(ax=ax,column='coldspot_precision',cmap="Blues",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+        ax.set_axis_off()
+        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.precision.png"), dpi=300, bbox_inches='tight')
+        plt.close('all')
+        
+        fig, ax = plt.subplots(1, figsize=(12, 12))
+        temp_map_with_data.assign(hotspot_recall=metrics_df['hotspot_recall'].values).plot(ax=ax,column='hotspot_recall',cmap="Reds",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+        temp_map_with_data.assign(coldspot_recall=metrics_df['coldspot_recall'].values).plot(ax=ax,column='coldspot_recall',cmap="Blues",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+        ax.set_axis_off()
+        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.recall.png"), dpi=300, bbox_inches='tight')
+        plt.close('all')
+
+        fig, ax = plt.subplots(1, figsize=(12, 12))
+        temp_map_with_data.assign(accuracy=metrics_df['accuracy'].values).plot(ax=ax,column='accuracy',cmap="Greens",alpha=1,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+        ax.set_axis_off()
+        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.accuracy.png"), dpi=300, bbox_inches='tight')
+        plt.close('all')
