@@ -10,6 +10,7 @@ from esda.getisord import G, G_Local
 from esda.moran import Moran, Moran_Local
 from splot._viz_utils import mask_local_auto
 from sklearn.metrics import classification_report,accuracy_score
+from testcase_modules.test_custom_confusion_matrix import CustomConfusionMatrix
 from testcase_modules.test_dataloading import TestDataLoading
 from testcase_modules.test_dataloading2 import TestDataLoading2
 from testcase_modules.test_geopackage import TestGEOPackage
@@ -201,56 +202,108 @@ class TestPlayCase2(TestPlayCase):
             true_df=self._read_file(self.input_path,file_name)
             self._evaluate_local_gistar(true_df.copy(),temp_file_name)
             self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
+            self._evaluate_local_moran(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
             # break;
+        
+        del geopackage_obj
+        gc.collect()
 
     def _evaluate_local_gistar(self,true_df,temp_file_name):
         pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.gistar.csv'))
         pred_df=pred_df.drop(columns=['most_cl','NAME_1'])
-        true_df['total']=true_df['total'].map({'mid':'not-significant','high':'hotspot','low':'coldspot'})
+        true_df['total']=true_df['total'].map({'mid':'not-hotspot','high':'hotspot','low':'not-hotspot'})
         y_true=true_df['total'].values
+        pred_df=pred_df.replace({
+            'not-significant':'not-hotspot',
+            'coldspot':'not-hotspot',
+            'hotspot':'hotspot'
+        })
         y_pred=pred_df.values
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
-        metrics_df[['hotspot_precision','hotspot_recall','coldspot_precision','coldspot_recall','accuracy']]=0
-        # metrics_dict=classification_report(true_df['total'].values,pred_df['cl_1'],output_dict=True)
-        # print(y_true,y_pred)
-        # sen_h=classification_report(y_true*self.n_sim,y_pred,labels=['not-significant','high','low'],output_dict=True)
+        metrics_df[CustomConfusionMatrix.get_column_names()]=0
         for i in range(len(y_true)):
-            metrics_dict=classification_report(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-significant','hotspot','coldspot'],output_dict=True)
-            metrics_df.iloc[i,1:] = (
-                    metrics_dict['hotspot']['precision'],
-                    metrics_dict['hotspot']['recall'],
-                    metrics_dict['coldspot']['precision'],
-                    metrics_dict['coldspot']['recall'],
-                    accuracy_score(np.array([y_true[i]]*self.n_sim),y_pred[i]))
+            cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
+            metrics_df.iloc[i,1:]=cm.get_values()
         metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.gistar.metrics.csv'),index=False)
+        
+        del pred_df,y_true,y_pred,metrics_df
+        gc.collect()
 
     def _plot_evaluate_local_gistar(self,geopackage_obj:TestGEOPackage,temp_file_name):
+
+        def _plot_evaluate_one(keyword,cmaps):
+            fig, ax = plt.subplots(1, figsize=(12, 12))
+            temp_map_with_data.assign(value=metrics_df[keyword].values).plot(ax=ax,column='value',cmap=cmaps,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+            temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+            ax.set_axis_off()
+            plt.savefig(os.path.join(self.output_path, temp_file_name+f".gistar.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
+            plt.close('all')    
+
         metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.gistar.metrics.csv'))
         temp_map_with_data=geopackage_obj.get_map()
-        # temp_map_with_data[['hotspot_precision','hotspot_recall','coldspot_precision','coldspot_recall','accuracy']]=metrics_df[['hotspot_precision','hotspot_recall','coldspot_precision','coldspot_recall','accuracy']].values
-        # ax=geoplot.polyplot(temp_map_with_data)
-        # geoplot.kdeplot(temp_map_with_data['hotspot_precision'])
-        # geoplot.kdeplot(temp_map_with_data.assign(hotspot_precision=metrics_df['hotspot_precision']))
-        fig, ax = plt.subplots(1, figsize=(12, 12))
-        temp_map_with_data.assign(hotspot_precision=metrics_df['hotspot_precision'].values).plot(ax=ax,column='hotspot_precision',cmap="Reds",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
-        temp_map_with_data.assign(coldspot_precision=metrics_df['coldspot_precision'].values).plot(ax=ax,column='coldspot_precision',cmap="Blues",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
-        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
-        ax.set_axis_off()
-        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.precision.png"), dpi=300, bbox_inches='tight')
-        plt.close('all')
-        
-        fig, ax = plt.subplots(1, figsize=(12, 12))
-        temp_map_with_data.assign(hotspot_recall=metrics_df['hotspot_recall'].values).plot(ax=ax,column='hotspot_recall',cmap="Reds",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
-        temp_map_with_data.assign(coldspot_recall=metrics_df['coldspot_recall'].values).plot(ax=ax,column='coldspot_recall',cmap="Blues",alpha=0.5,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
-        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
-        ax.set_axis_off()
-        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.recall.png"), dpi=300, bbox_inches='tight')
-        plt.close('all')
+        _plot_evaluate_one('precision','Reds')
 
-        fig, ax = plt.subplots(1, figsize=(12, 12))
-        temp_map_with_data.assign(accuracy=metrics_df['accuracy'].values).plot(ax=ax,column='accuracy',cmap="Greens",alpha=1,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
-        temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
-        ax.set_axis_off()
-        plt.savefig(os.path.join(self.output_path, temp_file_name+".gistar.metrics.accuracy.png"), dpi=300, bbox_inches='tight')
-        plt.close('all')
+        _plot_evaluate_one('recall','Oranges')
+
+        _plot_evaluate_one('specificity','Blues')
+
+        _plot_evaluate_one('npv','Purples')
+
+        _plot_evaluate_one('accuracy','Greens')
+
+        del temp_map_with_data,metrics_df
+        gc.collect()
+
+    def _evaluate_local_moran(self,true_df,temp_file_name):
+        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.localmoran.csv'))
+        pred_df=pred_df.drop(columns=['most_cl','NAME_1'])
+        true_df['total']=true_df['total'].map({
+            'mid':'not-hotspot',
+            'high':'hotspot',
+            'low':'not-hotspot'})
+        y_true=true_df['total'].values
+        pred_df=pred_df.replace({
+            'ns':'not-hotspot',
+            'LH':'not-hotspot',
+            'LL':'not-hotspot',
+            'HH':'hotspot',
+            'HL':'hotspot'
+        })
+        y_pred=pred_df.values
+
+        metrics_df=pd.DataFrame(true_df['NAME_1'])
+        metrics_df[CustomConfusionMatrix.get_column_names()]=0
+        for i in range(len(y_true)):
+            cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
+            metrics_df.iloc[i,1:]=cm.get_values()
+        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.localmoran.metrics.csv'),index=False)
+        
+        del pred_df,y_true,y_pred,metrics_df
+        gc.collect()
+
+    def _plot_evaluate_local_moran(self,geopackage_obj:TestGEOPackage,temp_file_name):
+
+        def _plot_evaluate_one(keyword,cmaps):
+            fig, ax = plt.subplots(1, figsize=(12, 12))
+            temp_map_with_data.assign(value=metrics_df[keyword].values).plot(ax=ax,column='value',cmap=cmaps,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+            temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+            ax.set_axis_off()
+            plt.savefig(os.path.join(self.output_path, temp_file_name+f".localmoran.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
+            plt.close('all')    
+
+        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.localmoran.metrics.csv'))
+        temp_map_with_data=geopackage_obj.get_map()
+        _plot_evaluate_one('precision','Reds')
+
+        _plot_evaluate_one('recall','Oranges')
+
+        _plot_evaluate_one('specificity','Blues')
+
+        _plot_evaluate_one('npv','Purples')
+
+        _plot_evaluate_one('accuracy','Greens')
+
+        del temp_map_with_data,metrics_df
+        gc.collect()

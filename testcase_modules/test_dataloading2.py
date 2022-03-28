@@ -26,7 +26,7 @@ class TestDataLoading2:
         for i in tqdm(range(self.n_sim),desc="Randomizing Sim",leave=False):
             exp_arr=self.exp_df['total'].values*100000
             theta_arr=self.input_df['total'].values
-            theta_arr=np.vectorize(theta_dict.get)(theta_arr)
+            theta_arr=np.vectorize(theta_dict.get, otypes=[np.float])(theta_arr)
             # print(theta_arr)
             mu_arr=exp_arr*theta_arr
             # print(mu_arr)
