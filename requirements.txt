@@ -283,7 +283,6 @@ dependencies:
   - typing-extensions=3.10.0.2=hd8ed1ab_0
   - typing_extensions=3.10.0.2=pyha770c72_0
   - tzcode=2021e=h7f98852_0
-  - tzdata=2021e=he74cb21_0
   - unicodedata2=14.0.0=py39h3811e60_0
   - urllib3=1.25.11=py_0
   - wcwidth=0.2.5=pyh9f0ad1d_2
@@ -318,7 +317,11 @@ dependencies:
     - lxml==4.7.1
     - markdown==3.3.6
     - opencv-contrib-python==4.5.3.56
+    - pytz-deprecation-shim==0.1.0.post0
+    - rpy2==3.4.5
     - simple-websocket==0.5.0
     - turbo-flask==0.8.0
+    - tzdata==2022.1
+    - tzlocal==4.1
     - werkzeug==2.0.2
 prefix: /home/kawin7538/miniconda3/envs/sp_lab
