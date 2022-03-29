@@ -1,0 +1,79 @@
+cat("\014")
+rm(list=ls())
+
+library(dplyr)
+library(sp)
+library(rgdal)
+library(RColorBrewer)
+library(geodata)
+library(spdep)
+
+mcd.df <- read.csv("~/training_coding_spatio-temporal/data/case_mcd_DF_2013.csv",stringsAsFactors=FALSE)
+mcd.df[mcd.df=="Bangkok"]<-"Bangkok Metropolis"
+mcd.df[mcd.df=="Bungkan"]<-"Bueng Kan"
+mcd.df[mcd.df=="P.Nakhon S.Ayutthaya"]<-"Phra Nakhon Si Ayutthaya"
+mcd.df<-mcd.df%>%rename(NAME_1=area)
+mcd.df<-mcd.df[order(mcd.df$NAME_1),c("NAME_1","total")]
+mcd.df["ID"]<-1:nrow(mcd.df)
+mcd.df
+
+pop.df<-read.csv("~/CSV files/pop_10year.csv",stringsAsFactors=FALSE)
+mcd.df["pop"]<-pop.df["X2020"]
+
+thai_map2<-geodata::gadm(country="Thailand",level=1,path='.')
+thai_map2
+
+thai_map2.corrected<-merge(thai_map2,mcd.df,by='NAME_1')
+print(names(thai_map2.corrected))
+thai_map2.corrected
+
+adj_list=adjacent(thai_map2[order(thai_map2$NAME_1),],type='queen',symmetrical=TRUE)
+# add pair "Phung Nga" and "Phuket"
+adj_list<-rbind(adj_list,c(39,48))
+adj_mat<-matrix(0,77,77)
+adj_mat[adj_list]<-1
+adj_mat[adj_list[,c(2,1)]]<-1
+adj_mat
+
+W<-mat2listw(adj_mat,style='B')
+
+library(INLA)
+library(parallel)
+
+options(mc.cores=1)
+
+tmarg <- function(marginals) {
+  post.means <- mclapply(marginals, function (marg) {
+    # Transform post. marginals
+    aux <- inla.tmarginal(exp, marg)
+    # Compute posterior mean
+    inla.emarginal(function(x) x, aux)
+  })
+  
+  return(as.vector(unlist(post.means)))
+}
+
+formula<-total~1+f(ID,model="besag",graph=listw2mat(W))
+
+custommodel.besag<-inla(
+  formula,
+  data=as.data.frame(mcd.df),
+  family="poisson",
+  E=pop,
+  control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE,return.marginals.predictor=TRUE),
+  control.predictor=list(compute=TRUE),
+)
+
+summary(custommodel.besag)
+
+custommodel.besag$summary.fitted.values$mean
+
+#thai_map2.corrected[,'besag']<-tmarg(custommodel.besag$marginals.fitted.values)
+thai_map2.corrected[,'besag']<-(custommodel.besag$summary.fitted.values$mean*mcd.df['pop'])
+#thai_map2.corrected['besag']=0
+
+png(file=paste("~/output/besag_posteria_mean.png",sep=''),width=450,height=800,res=72)
+#spplot(thai_map2.corrected,"besag",do.log=TRUE,scales=list(draw=TRUE),legendEntries=c("low","inter","high"))
+plot(thai_map2.corrected$total,thai_map2.corrected$besag)
+abline(0,1)
+dev.off()
