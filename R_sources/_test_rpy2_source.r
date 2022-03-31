@@ -1,6 +1,8 @@
 func1 <- function(x,y){
-    png("plot_preview.png")
-    plot(x,y)
-    abline(0,1)
-    dev.off()
+    library(dplyr)
+    library(sp)
+    library(rgdal)
+    library(RColorBrewer)
+    library(geodata)
+    library(spdep)
 }
