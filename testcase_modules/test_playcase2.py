@@ -254,10 +254,10 @@ class TestPlayCase2(TestPlayCase):
             temp_file_name=file_name.split('.')[0]
             # input_df=pd.read_json(os.path.join(self.input_path,file_name))
             true_df=self._read_file(self.input_path,file_name)
-            # self._evaluate_local_gistar(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
-            # self._evaluate_local_moran(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
+            self._evaluate_local_gistar(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
+            self._evaluate_local_moran(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
             self._evaluate_besag(true_df.copy(),temp_file_name)
             self._plot_evaluate_besag(geopackage_obj,temp_file_name)
             # break;
@@ -279,7 +279,7 @@ class TestPlayCase2(TestPlayCase):
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
         metrics_df[CustomConfusionMatrix.get_column_names()]=0
-        for i in range(len(y_true)):
+        for i in tqdm(range(len(y_true)),desc="Evaluate GiStar",leave=False):
             cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
             metrics_df.iloc[i,1:]=cm.get_values()
         metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.gistar.metrics.csv'),index=False)
@@ -331,7 +331,7 @@ class TestPlayCase2(TestPlayCase):
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
         metrics_df[CustomConfusionMatrix.get_column_names()]=0
-        for i in range(len(y_true)):
+        for i in tqdm(range(len(y_true)),desc="Evaluate localmoran",leave=False):
             cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
             metrics_df.iloc[i,1:]=cm.get_values()
         metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.localmoran.metrics.csv'),index=False)
@@ -380,7 +380,7 @@ class TestPlayCase2(TestPlayCase):
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
         metrics_df[CustomConfusionMatrix.get_column_names()]=0
-        for i in range(len(y_true)):
+        for i in tqdm(range(len(y_true)),desc="Evaluate BESAG",leave=False):
             cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
             metrics_df.iloc[i,1:]=cm.get_values()
         metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.besag.metrics.csv'),index=False)
