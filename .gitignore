@@ -3,7 +3,6 @@
 # *.csv
 *.rtf
 *.xlsx
-*.gpkg
 *.zip
 # *.json
 .vscode/*
