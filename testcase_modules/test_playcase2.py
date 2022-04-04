@@ -24,6 +24,7 @@ r = robjects.r
 r['source']('R_sources/_test_playcase2_source.r')
 
 r_run_besag=robjects.globalenv['run_besag']
+r_run_bym=robjects.globalenv['run_bym']
 
 class TestPlayCase2(TestPlayCase):
     def __init__(self,n_sim=100) -> None:
@@ -79,10 +80,11 @@ class TestPlayCase2(TestPlayCase):
             self._plot_local_moran(geopackage_obj,temp_file_name)
             self._action_besag(input_df,geopackage_obj,temp_file_name)
             self._plot_besag(geopackage_obj,temp_file_name)
+            self._action_bym(input_df,geopackage_obj,temp_file_name)
+            self._plot_bym(geopackage_obj,temp_file_name)
 
             del input_df, temp_input_df, dataloading_obj, temp_file_name
             gc.collect()
-            # break;
 
     def _plot_exp_dist(self,dataloading_obj: TestDataLoading, file_name):
         theta_dict={
@@ -156,7 +158,7 @@ class TestPlayCase2(TestPlayCase):
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".gistar.png"), dpi=300, bbox_inches='tight')
+                    [0]+".gistar.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
     def _action_local_moran(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
@@ -201,7 +203,7 @@ class TestPlayCase2(TestPlayCase):
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".localmoran.png"), dpi=300, bbox_inches='tight')
+                    [0]+".localmoran.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
     def _action_besag(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
@@ -245,7 +247,51 @@ class TestPlayCase2(TestPlayCase):
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".besag.png"), dpi=300, bbox_inches='tight')
+                    [0]+".besag.png"), dpi=150, bbox_inches='tight')
+        plt.close('all')
+
+    def _action_bym(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
+        temp_list_df=[]
+        for i in tqdm(range(self.n_sim),desc="Action BYM",leave=False):
+            temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
+            # dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
+            temp_list_df.append(self._action_bym_one(temp_input_df).rename(columns={'cl':f'cl_{i+1}'}))
+        bym_df=pd.concat(temp_list_df,axis=1)
+        # print(gistar_df.apply(pd.Series.value_counts,axis=1))
+        bym_df['most_cl']=bym_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
+        bym_df=bym_df.reset_index()
+        bym_df.to_csv(os.path.join(self.output_path,file_name+".bym.csv"),index=False)
+        del temp_list_df,bym_df,temp_input_df
+        gc.collect()
+
+    def _action_bym_one(self, input_df:pd.DataFrame) -> pd.DataFrame:
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            input_df_r = robjects.conversion.py2rpy(input_df)
+        ans_df_r=r_run_bym(input_df_r)
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            ans_df = robjects.conversion.rpy2py(ans_df_r)
+        return ans_df[['NAME_1','cl']].set_index("NAME_1").replace({1:'hotspot',0:'not-hotspot'})
+
+    def _plot_bym(self, geopackage_obj: TestGEOPackage, file_name):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".bym.csv"))[['NAME_1','most_cl']]
+        color_list = ['red', 'lightgrey']
+        spots = ['hotspot','not-hotspot'][::-1]
+        hmap = colors.ListedColormap(color_list)
+        hotcoldspot=input_df['most_cl'].map({
+            'hotspot':0,
+            'not-hotspot':1
+        }).values
+        color_labels = [color_list[i] for i in hotcoldspot]
+        dataloading_obj=TestDataLoading(geopackage_obj,input_df.rename(columns={'most_cl':'total'}),100)
+
+        fig, ax = plt.subplots(1, figsize=(12, 12))
+
+        dataloading_obj.map_with_data.assign(spot=hotcoldspot,cl=input_df['most_cl']).plot(
+            column='cl', categorical=True, linewidth=1, ax=ax, edgecolor='black', cmap=hmap, k=2, categories=spots[::-1], legend=True)
+
+        ax.set_axis_off()
+        plt.savefig(os.path.join(self.output_path, file_name.split('.')
+                    [0]+".bym.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
     def evaluate_case(self):
@@ -260,6 +306,8 @@ class TestPlayCase2(TestPlayCase):
             self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
             self._evaluate_besag(true_df.copy(),temp_file_name)
             self._plot_evaluate_besag(geopackage_obj,temp_file_name)
+            self._evaluate_bym(true_df.copy(),temp_file_name)
+            self._plot_evaluate_bym(geopackage_obj,temp_file_name)
             # break;
         
         del geopackage_obj
@@ -399,6 +447,55 @@ class TestPlayCase2(TestPlayCase):
             plt.close('all')    
 
         metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.besag.metrics.csv'))
+        temp_map_with_data=geopackage_obj.get_map()
+        _plot_evaluate_one('precision','Reds')
+
+        _plot_evaluate_one('recall','Oranges')
+
+        _plot_evaluate_one('specificity','Blues')
+
+        _plot_evaluate_one('npv','Purples')
+
+        _plot_evaluate_one('accuracy','Greens')
+
+        del temp_map_with_data,metrics_df
+        gc.collect()
+
+    def _evaluate_bym(self,true_df,temp_file_name):
+        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.bym.csv'))
+        pred_df=pred_df.drop(columns=['most_cl','NAME_1'])
+        true_df['total']=true_df['total'].map({
+            'mid':'not-hotspot',
+            'high':'hotspot',
+            'low':'not-hotspot'})
+        y_true=true_df['total'].values
+        # pred_df=pred_df.replace({
+        #     'not-hotspot':'not-hotspot',
+        #     'hotspot':'hotspot'
+        # })
+        y_pred=pred_df.values
+
+        metrics_df=pd.DataFrame(true_df['NAME_1'])
+        metrics_df[CustomConfusionMatrix.get_column_names()]=0
+        for i in tqdm(range(len(y_true)),desc="Evaluate BYM",leave=False):
+            cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
+            metrics_df.iloc[i,1:]=cm.get_values()
+        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.bym.metrics.csv'),index=False)
+        
+        del pred_df,y_true,y_pred,metrics_df
+        gc.collect()
+
+    def _plot_evaluate_bym(self,geopackage_obj:TestGEOPackage,temp_file_name):
+
+        def _plot_evaluate_one(keyword,cmaps):
+            fig, ax = plt.subplots(1, figsize=(12, 12))
+            temp_map_with_data.assign(value=metrics_df[keyword].values).plot(ax=ax,column='value',cmap=cmaps,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
+            temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
+            ax.set_axis_off()
+            plt.savefig(os.path.join(self.output_path, temp_file_name+f".bym.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
+            plt.close('all')    
+
+        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.bym.metrics.csv'))
         temp_map_with_data=geopackage_obj.get_map()
         _plot_evaluate_one('precision','Reds')
 
