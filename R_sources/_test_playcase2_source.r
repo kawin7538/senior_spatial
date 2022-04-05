@@ -107,7 +107,7 @@ run_satscan <- function(test_df){
     ss.options(list(CaseFile="Testcase.cas", PrecisionCaseTimes=0,
                     PopulationFile="Testcase.pop",
                     CoordinatesFile="Testcase.geo", CoordinatesType=0, AnalysisType=1,
-                    ModelType=0, ScanAreas=1, TimeAggregationUnits=0, MaxSpatialSizeInPopulationAtRisk_Reported=25,MaxSizeInMaxCirclePopulationFile_Reported=25))
+                    ModelType=0, ScanAreas=1, TimeAggregationUnits=0, MaxSpatialSizeInPopulationAtRisk_Reported=50,MaxSizeInMaxCirclePopulationFile_Reported=50))
     ss.options(c("NonCompactnessPenalty=0", "ReportGiniClusters=n", "LogRunToHistoryFile=n"))
     write.ss.prm(td,"Testcase")
     testcase_satscan = satscan(td,"Testcase",sslocation="satscan_sources",ssbatchfilename="satscan_stdc++6_x86_64_64bit",verbose = FALSE)
