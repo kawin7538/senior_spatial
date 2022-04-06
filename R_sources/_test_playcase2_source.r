@@ -43,7 +43,7 @@ run_besag <- function(test_df){
 
     marginal<-custommodel.besag$marginals.fitted.values
     exc <- sapply(custommodel.besag$marginals.fitted.values,
-                FUN = function(marg){1-inla.pmarginal(q=1, marginal = marg)})
+                FUN = function(marg){1-inla.pmarginal(q=2, marginal = marg)})
 
     test_df['exc']<-exc
     test_df['cl']<-exc>0.95
@@ -75,7 +75,7 @@ run_bym <- function(test_df){
 
     marginal<-custommodel.besag$marginals.fitted.values
     exc <- sapply(custommodel.besag$marginals.fitted.values,
-                FUN = function(marg){1-inla.pmarginal(q=1, marginal = marg)})
+                FUN = function(marg){1-inla.pmarginal(q=2, marginal = marg)})
 
     test_df['exc']<-exc
     test_df['cl']<-exc>0.95
