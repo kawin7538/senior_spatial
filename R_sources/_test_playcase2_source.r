@@ -120,5 +120,5 @@ run_satscan <- function(test_df){
     test_df[,'cl']<-FALSE
     test_df[hotspot.tmp,'cl']<-TRUE
 
-    return(test_df)
+    return(list(test_df,cluster.center[cluster.center$P_VALUE<0.05,]))
 }

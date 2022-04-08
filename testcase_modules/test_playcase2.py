@@ -1,8 +1,15 @@
 import gc
 import os
 from matplotlib import colors, pyplot as plt
+import folium
+from selenium import webdriver
+from selenium.webdriver import FirefoxOptions
+import time
+import io
+from PIL import Image
 import numpy as np
 import pandas as pd
+import geopandas
 
 from tqdm import tqdm
 from esda.getisord import G, G_Local
@@ -74,17 +81,18 @@ class TestPlayCase2(TestPlayCase):
             dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
             temp_file_name="".join(file_name.split(".")[0])
 
-            self._plot_mean_dist(dataloading_obj, temp_file_name)
-            self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
-            self._plot_local_gistar(geopackage_obj,temp_file_name)
-            self._action_local_moran(input_df,geopackage_obj,temp_file_name)
-            self._plot_local_moran(geopackage_obj,temp_file_name)
+            # self._plot_mean_dist(dataloading_obj, temp_file_name)
+            # self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
+            # self._plot_local_gistar(geopackage_obj,temp_file_name)
+            # self._action_local_moran(input_df,geopackage_obj,temp_file_name)
+            # self._plot_local_moran(geopackage_obj,temp_file_name)
             self._action_besag(input_df,geopackage_obj,temp_file_name)
             self._plot_besag(geopackage_obj,temp_file_name)
             # self._action_bym(input_df,geopackage_obj,temp_file_name)
             # self._plot_bym(geopackage_obj,temp_file_name)
-            self._action_satscan(input_df,geopackage_obj,temp_file_name)
-            self._plot_satscan(geopackage_obj,temp_file_name)
+            # self._action_satscan(input_df,geopackage_obj,temp_file_name)
+            # self._plot_satscan(geopackage_obj,temp_file_name)
+            # self._plot_satscan_center(geopackage_obj,temp_file_name)
 
             del input_df, temp_input_df, dataloading_obj, temp_file_name
             gc.collect()
@@ -299,25 +307,37 @@ class TestPlayCase2(TestPlayCase):
 
     def _action_satscan(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
         temp_list_df=[]
+        temp_list_center_df=[]
         for i in tqdm(range(self.n_sim),desc="Action SaTScan",leave=False):
             temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
             # dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
-            temp_list_df.append(self._action_satscan_one(temp_input_df).rename(columns={'cl':f'cl_{i+1}'}))
-        bym_df=pd.concat(temp_list_df,axis=1)
+            temp_df, temp_center_df=self._action_satscan_one(temp_input_df)
+            # temp_list_df.append(self._action_satscan_one(temp_input_df).rename(columns={'cl':f'cl_{i+1}'}))
+            temp_list_df.append(temp_df.rename(columns={'cl':f'cl_{i+1}'}))
+            temp_center_df['n']=i+1
+            temp_list_center_df.append(temp_center_df)
+        satscan_df=pd.concat(temp_list_df,axis=1)
         # print(gistar_df.apply(pd.Series.value_counts,axis=1))
-        bym_df['most_cl']=bym_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
-        bym_df=bym_df.reset_index()
-        bym_df.to_csv(os.path.join(self.output_path,file_name+".satscan.csv"),index=False)
-        del temp_list_df,bym_df,temp_input_df
+        satscan_df['most_cl']=satscan_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
+        satscan_df=satscan_df.reset_index()
+        satscan_df.to_csv(os.path.join(self.output_path,file_name+".satscan.csv"),index=False)
+
+        satscan_center_df=pd.concat(temp_list_center_df,axis=0)
+        satscan_center_df=satscan_center_df.groupby(["LOC_ID"]).agg({'RADIUS':np.mean}).reset_index()
+        satscan_center_df.to_csv(os.path.join(self.output_path,file_name+".satscan.center.csv"),index=False)
+        del temp_list_df,satscan_df,temp_input_df,temp_df,temp_center_df,satscan_center_df
         gc.collect()
 
     def _action_satscan_one(self, input_df:pd.DataFrame) -> pd.DataFrame:
         with localconverter(robjects.default_converter + pandas2ri.converter):
             input_df_r = robjects.conversion.py2rpy(input_df)
-        ans_df_r=r_run_satscan(input_df_r)
+        ans_df_r,cluster_center_r=r_run_satscan(input_df_r)
         with localconverter(robjects.default_converter + pandas2ri.converter):
             ans_df = robjects.conversion.rpy2py(ans_df_r)
-        return ans_df[['NAME_1','cl']].set_index("NAME_1").replace({1:'hotspot',0:'not-hotspot'})
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            cluster_center = robjects.conversion.rpy2py(cluster_center_r)
+        return ans_df[['NAME_1','cl']].set_index("NAME_1").replace({1:'hotspot',0:'not-hotspot'}), \
+            cluster_center[['LOC_ID','P_VALUE','X','Y','RADIUS']]
 
     def _plot_satscan(self, geopackage_obj: TestGEOPackage, file_name):
         input_df=pd.read_csv(os.path.join(self.output_path,file_name+".satscan.csv"))[['NAME_1','most_cl']]
@@ -340,22 +360,59 @@ class TestPlayCase2(TestPlayCase):
         plt.savefig(os.path.join(self.output_path, file_name.split('.')[0]+".satscan.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
+    def _plot_satscan_center(self, geopackage_obj: TestGEOPackage, file_name):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".satscan.csv"))[['NAME_1','most_cl']]
+        # input_df['color']=input_df['most_cl'].apply(lambda x:'orange' if x=='hotspot' else 'yellow')
+        temp_map=geopackage_obj.get_map()
+        temp_map['color']='yellow'
+        temp_map.loc[input_df['most_cl']=='hotspot','color']='red'
+        # temp_map['color']=input_df['most_cl'].apply(lambda x:'red' if x=='hotspot' else 'orange')
+        m=folium.Map(location=[13.03887,101.490104],zoom_start=6)
+        geo_j=temp_map[['color','geometry']].to_json()
+        folium.GeoJson(data=geo_j, style_function=lambda x: {
+            'fillColor': x['properties']['color'],
+            'weight':1,
+            'color':'black',
+            'fillOpacity':0.4
+            }).add_to(m)
+
+        input_center_df=pd.read_csv(os.path.join(self.output_path,file_name+".satscan.center.csv"))
+        for _,r in input_center_df.iterrows():
+            temp_index=r['LOC_ID']-1
+            temp_index=int(temp_index)
+            selected_geopackage_obj=geopackage_obj.get_map().copy()
+            selected_geopackage_obj=selected_geopackage_obj.iloc[temp_index]
+            folium.Circle([selected_geopackage_obj['centroid'].y,selected_geopackage_obj['centroid'].x],radius=r['RADIUS']*1000*1000).add_to(m)
+        
+        m.save(os.path.join(self.output_path,file_name+".satscan.center.html"))
+
+        opts=FirefoxOptions()
+        opts.add_argument("--headless")
+        driver=webdriver.Firefox(executable_path="/usr/local/bin/geckodriver",options=opts)
+        driver.get("file://"+os.path.join(os.getcwd(),self.output_path,file_name+".satscan.center.html"))
+        time.sleep(10)
+        driver.save_screenshot(os.path.join(self.output_path,file_name+".satscan.center.png"))
+        driver.quit()
+        
+        del m,opts,driver,geo_j,temp_map,input_df,input_center_df
+        gc.collect()
+
     def evaluate_case(self):
         geopackage_obj=TestGEOPackage(1,1,"Thailand")
         for file_name in tqdm(self.list_file_name,desc="Evaluating Case",leave=True):
             temp_file_name=file_name.split('.')[0]
             # input_df=pd.read_json(os.path.join(self.input_path,file_name))
             true_df=self._read_file(self.input_path,file_name)
-            self._evaluate_local_gistar(true_df.copy(),temp_file_name)
-            self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
-            self._evaluate_local_moran(true_df.copy(),temp_file_name)
-            self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
+            # self._evaluate_local_gistar(true_df.copy(),temp_file_name)
+            # self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
+            # self._evaluate_local_moran(true_df.copy(),temp_file_name)
+            # self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
             self._evaluate_besag(true_df.copy(),temp_file_name)
             self._plot_evaluate_besag(geopackage_obj,temp_file_name)
             # self._evaluate_bym(true_df.copy(),temp_file_name)
             # self._plot_evaluate_bym(geopackage_obj,temp_file_name)
-            self._evaluate_satscan(true_df.copy(),temp_file_name)
-            self._plot_evaluate_satscan(geopackage_obj,temp_file_name)
+            # self._evaluate_satscan(true_df.copy(),temp_file_name)
+            # self._plot_evaluate_satscan(geopackage_obj,temp_file_name)
             # break;
         
         del geopackage_obj
