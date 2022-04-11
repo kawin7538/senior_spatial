@@ -19,7 +19,7 @@ adj_mat[adj_list[,c(2,1)]]<-1
 W<-mat2listw(adj_mat,style='B')
 centroid<-centroids(thai_map2)
 
-run_besag <- function(test_df){
+run_besag <- function(test_df,q){
     test_df['ID']<-1:nrow(test_df)
     test_df['E']<-pop.df['total']*100000
     test_df['total_raw']<-test_df['total']
@@ -43,7 +43,7 @@ run_besag <- function(test_df){
 
     marginal<-custommodel.besag$marginals.fitted.values
     exc <- sapply(custommodel.besag$marginals.fitted.values,
-                FUN = function(marg){1-inla.pmarginal(q=2, marginal = marg)})
+                FUN = function(marg){1-inla.pmarginal(q=q, marginal = marg)})
 
     test_df['exc']<-exc
     test_df['cl']<-exc>0.95
@@ -51,7 +51,7 @@ run_besag <- function(test_df){
     return(test_df)
 }
 
-run_bym <- function(test_df){
+run_bym <- function(test_df,q){
     test_df['ID']<-1:nrow(test_df)
     test_df['E']<-pop.df['total']*100000
     test_df['total_raw']<-test_df['total']
@@ -75,7 +75,7 @@ run_bym <- function(test_df){
 
     marginal<-custommodel.besag$marginals.fitted.values
     exc <- sapply(custommodel.besag$marginals.fitted.values,
-                FUN = function(marg){1-inla.pmarginal(q=2, marginal = marg)})
+                FUN = function(marg){1-inla.pmarginal(q=q, marginal = marg)})
 
     test_df['exc']<-exc
     test_df['cl']<-exc>0.95

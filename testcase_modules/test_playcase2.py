@@ -10,6 +10,7 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 import geopandas
+import cartopy.crs as ccrs
 
 from tqdm import tqdm
 from esda.getisord import G, G_Local
@@ -81,17 +82,21 @@ class TestPlayCase2(TestPlayCase):
             dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
             temp_file_name="".join(file_name.split(".")[0])
 
-            # self._plot_mean_dist(dataloading_obj, temp_file_name)
-            # self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
-            # self._plot_local_gistar(geopackage_obj,temp_file_name)
-            # self._action_local_moran(input_df,geopackage_obj,temp_file_name)
-            # self._plot_local_moran(geopackage_obj,temp_file_name)
-            self._action_besag(input_df,geopackage_obj,temp_file_name)
-            self._plot_besag(geopackage_obj,temp_file_name)
-            # self._action_bym(input_df,geopackage_obj,temp_file_name)
-            # self._plot_bym(geopackage_obj,temp_file_name)
-            # self._action_satscan(input_df,geopackage_obj,temp_file_name)
-            # self._plot_satscan(geopackage_obj,temp_file_name)
+            self._plot_mean_dist(dataloading_obj, temp_file_name)
+            self._action_local_gistar(input_df,geopackage_obj,temp_file_name)
+            self._plot_local_gistar(geopackage_obj,temp_file_name)
+            self._action_local_moran(input_df,geopackage_obj,temp_file_name)
+            self._plot_local_moran(geopackage_obj,temp_file_name)
+            self._action_besag(input_df,geopackage_obj,temp_file_name,1)
+            self._plot_besag(geopackage_obj,temp_file_name,1)
+            self._action_besag(input_df,geopackage_obj,temp_file_name,2)
+            self._plot_besag(geopackage_obj,temp_file_name,2)
+            self._action_bym(input_df,geopackage_obj,temp_file_name,1)
+            self._plot_bym(geopackage_obj,temp_file_name,1)
+            self._action_bym(input_df,geopackage_obj,temp_file_name,2)
+            self._plot_bym(geopackage_obj,temp_file_name,2)
+            self._action_satscan(input_df,geopackage_obj,temp_file_name)
+            self._plot_satscan(geopackage_obj,temp_file_name)
             # self._plot_satscan_center(geopackage_obj,temp_file_name)
 
             del input_df, temp_input_df, dataloading_obj, temp_file_name
@@ -217,30 +222,30 @@ class TestPlayCase2(TestPlayCase):
                     [0]+".localmoran.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
-    def _action_besag(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
+    def _action_besag(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name,q: int):
         temp_list_df=[]
-        for i in tqdm(range(self.n_sim),desc="Action BESAG",leave=False):
+        for i in tqdm(range(self.n_sim),desc=f"Action BESAG q={q}",leave=False):
             temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
             # dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
-            temp_list_df.append(self._action_besag_one(temp_input_df).rename(columns={'cl':f'cl_{i+1}'}))
+            temp_list_df.append(self._action_besag_one(temp_input_df,q).rename(columns={'cl':f'cl_{i+1}'}))
         besag_df=pd.concat(temp_list_df,axis=1)
         # print(gistar_df.apply(pd.Series.value_counts,axis=1))
         besag_df['most_cl']=besag_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
         besag_df=besag_df.reset_index()
-        besag_df.to_csv(os.path.join(self.output_path,file_name+".besag.csv"),index=False)
+        besag_df.to_csv(os.path.join(self.output_path,file_name+f".besag-q{q}.csv"),index=False)
         del temp_list_df,besag_df,temp_input_df
         gc.collect()
 
-    def _action_besag_one(self, input_df:pd.DataFrame) -> pd.DataFrame:
+    def _action_besag_one(self, input_df:pd.DataFrame,q:int) -> pd.DataFrame:
         with localconverter(robjects.default_converter + pandas2ri.converter):
             input_df_r = robjects.conversion.py2rpy(input_df)
-        ans_df_r=r_run_besag(input_df_r)
+        ans_df_r=r_run_besag(input_df_r,q)
         with localconverter(robjects.default_converter + pandas2ri.converter):
             ans_df = robjects.conversion.rpy2py(ans_df_r)
         return ans_df[['NAME_1','cl']].set_index("NAME_1").replace({1:'hotspot',0:'not-hotspot'})
 
-    def _plot_besag(self, geopackage_obj: TestGEOPackage, file_name):
-        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".besag.csv"))[['NAME_1','most_cl']]
+    def _plot_besag(self, geopackage_obj: TestGEOPackage, file_name,q:int):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+f".besag-q{q}.csv"))[['NAME_1','most_cl']]
         color_list = ['red', 'lightgrey']
         spots = ['hotspot','not-hotspot'][::-1]
         hmap = colors.ListedColormap(color_list)
@@ -258,33 +263,33 @@ class TestPlayCase2(TestPlayCase):
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".besag.png"), dpi=150, bbox_inches='tight')
+                    [0]+f".besag-q{q}.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
-    def _action_bym(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
+    def _action_bym(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name,q:int):
         temp_list_df=[]
-        for i in tqdm(range(self.n_sim),desc="Action BYM",leave=False):
+        for i in tqdm(range(self.n_sim),desc=f"Action BYM q={q}",leave=False):
             temp_input_df=input_df[['NAME_1',f'total_{i+1}']].rename(columns={f'total_{i+1}':'total'}).copy()
             # dataloading_obj=TestDataLoading(geopackage_obj,temp_input_df,100)
-            temp_list_df.append(self._action_bym_one(temp_input_df).rename(columns={'cl':f'cl_{i+1}'}))
+            temp_list_df.append(self._action_bym_one(temp_input_df,q).rename(columns={'cl':f'cl_{i+1}'}))
         bym_df=pd.concat(temp_list_df,axis=1)
         # print(gistar_df.apply(pd.Series.value_counts,axis=1))
         bym_df['most_cl']=bym_df.apply(pd.Series.value_counts,axis=1).idxmax(axis=1).values
         bym_df=bym_df.reset_index()
-        bym_df.to_csv(os.path.join(self.output_path,file_name+".bym.csv"),index=False)
+        bym_df.to_csv(os.path.join(self.output_path,file_name+f".bym-q{q}.csv"),index=False)
         del temp_list_df,bym_df,temp_input_df
         gc.collect()
 
-    def _action_bym_one(self, input_df:pd.DataFrame) -> pd.DataFrame:
+    def _action_bym_one(self, input_df:pd.DataFrame,q:int) -> pd.DataFrame:
         with localconverter(robjects.default_converter + pandas2ri.converter):
             input_df_r = robjects.conversion.py2rpy(input_df)
-        ans_df_r=r_run_bym(input_df_r)
+        ans_df_r=r_run_bym(input_df_r,q)
         with localconverter(robjects.default_converter + pandas2ri.converter):
             ans_df = robjects.conversion.rpy2py(ans_df_r)
         return ans_df[['NAME_1','cl']].set_index("NAME_1").replace({1:'hotspot',0:'not-hotspot'})
 
-    def _plot_bym(self, geopackage_obj: TestGEOPackage, file_name):
-        input_df=pd.read_csv(os.path.join(self.output_path,file_name+".bym.csv"))[['NAME_1','most_cl']]
+    def _plot_bym(self, geopackage_obj: TestGEOPackage, file_name,q:int):
+        input_df=pd.read_csv(os.path.join(self.output_path,file_name+f".bym-q{q}.csv"))[['NAME_1','most_cl']]
         color_list = ['red', 'lightgrey']
         spots = ['hotspot','not-hotspot'][::-1]
         hmap = colors.ListedColormap(color_list)
@@ -302,7 +307,7 @@ class TestPlayCase2(TestPlayCase):
 
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name.split('.')
-                    [0]+".bym.png"), dpi=150, bbox_inches='tight')
+                    [0]+f".bym-q{q}.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
 
     def _action_satscan(self, input_df:pd.DataFrame, geopackage_obj: TestGEOPackage, file_name):
@@ -323,7 +328,7 @@ class TestPlayCase2(TestPlayCase):
         satscan_df.to_csv(os.path.join(self.output_path,file_name+".satscan.csv"),index=False)
 
         satscan_center_df=pd.concat(temp_list_center_df,axis=0)
-        satscan_center_df=satscan_center_df.groupby(["LOC_ID"]).agg({'RADIUS':np.mean}).reset_index()
+        satscan_center_df=satscan_center_df.groupby(["LOC_ID"]).agg({'RADIUS':np.mean,'X':np.mean,'Y':np.mean}).reset_index()
         satscan_center_df.to_csv(os.path.join(self.output_path,file_name+".satscan.center.csv"),index=False)
         del temp_list_df,satscan_df,temp_input_df,temp_df,temp_center_df,satscan_center_df
         gc.collect()
@@ -361,41 +366,23 @@ class TestPlayCase2(TestPlayCase):
         plt.close('all')
 
     def _plot_satscan_center(self, geopackage_obj: TestGEOPackage, file_name):
+        #unfinished
         input_df=pd.read_csv(os.path.join(self.output_path,file_name+".satscan.csv"))[['NAME_1','most_cl']]
-        # input_df['color']=input_df['most_cl'].apply(lambda x:'orange' if x=='hotspot' else 'yellow')
         temp_map=geopackage_obj.get_map()
-        temp_map['color']='yellow'
-        temp_map.loc[input_df['most_cl']=='hotspot','color']='red'
-        # temp_map['color']=input_df['most_cl'].apply(lambda x:'red' if x=='hotspot' else 'orange')
-        m=folium.Map(location=[13.03887,101.490104],zoom_start=6)
-        geo_j=temp_map[['color','geometry']].to_json()
-        folium.GeoJson(data=geo_j, style_function=lambda x: {
-            'fillColor': x['properties']['color'],
-            'weight':1,
-            'color':'black',
-            'fillOpacity':0.4
-            }).add_to(m)
-
-        input_center_df=pd.read_csv(os.path.join(self.output_path,file_name+".satscan.center.csv"))
-        for _,r in input_center_df.iterrows():
-            temp_index=r['LOC_ID']-1
-            temp_index=int(temp_index)
-            selected_geopackage_obj=geopackage_obj.get_map().copy()
-            selected_geopackage_obj=selected_geopackage_obj.iloc[temp_index]
-            folium.Circle([selected_geopackage_obj['centroid'].y,selected_geopackage_obj['centroid'].x],radius=r['RADIUS']*1000*1000).add_to(m)
+        temp_map=temp_map.to_crs(3395)
+        temp_map['cl']=input_df['most_cl']
+        # fig, ax = plt.subplots(1, figsize=(12, 12))
+        fig=plt.figure(figsize=(12, 12))
+        ax=fig.add_subplot(111,projection=ccrs.epsg(3395))
+        temp_map.plot(column="cl",ax=ax)
+        # ax.tissot(radius_deg=2.5,lons=[100,],lats=[13,])
+        ax.tissot(lon_0=100, lat_0=13, radius_deg=2.5)
+        # ax.scatter([100,],[13,],s=2.5)
+        # plt.savefig(os.path.join(self.output_path,file_name+".satscan.center.png"))
+        # plt.close('all')
+        fig.savefig(os.path.join(self.output_path,file_name+".satscan.center.png"))
+        fig.close('all')
         
-        m.save(os.path.join(self.output_path,file_name+".satscan.center.html"))
-
-        opts=FirefoxOptions()
-        opts.add_argument("--headless")
-        driver=webdriver.Firefox(executable_path="/usr/local/bin/geckodriver",options=opts)
-        driver.get("file://"+os.path.join(os.getcwd(),self.output_path,file_name+".satscan.center.html"))
-        time.sleep(10)
-        driver.save_screenshot(os.path.join(self.output_path,file_name+".satscan.center.png"))
-        driver.quit()
-        
-        del m,opts,driver,geo_j,temp_map,input_df,input_center_df
-        gc.collect()
 
     def evaluate_case(self):
         geopackage_obj=TestGEOPackage(1,1,"Thailand")
@@ -403,16 +390,20 @@ class TestPlayCase2(TestPlayCase):
             temp_file_name=file_name.split('.')[0]
             # input_df=pd.read_json(os.path.join(self.input_path,file_name))
             true_df=self._read_file(self.input_path,file_name)
-            # self._evaluate_local_gistar(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
-            # self._evaluate_local_moran(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
-            self._evaluate_besag(true_df.copy(),temp_file_name)
-            self._plot_evaluate_besag(geopackage_obj,temp_file_name)
-            # self._evaluate_bym(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_bym(geopackage_obj,temp_file_name)
-            # self._evaluate_satscan(true_df.copy(),temp_file_name)
-            # self._plot_evaluate_satscan(geopackage_obj,temp_file_name)
+            self._evaluate_local_gistar(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_gistar(geopackage_obj,temp_file_name)
+            self._evaluate_local_moran(true_df.copy(),temp_file_name)
+            self._plot_evaluate_local_moran(geopackage_obj,temp_file_name)
+            self._evaluate_besag(true_df.copy(),temp_file_name,1)
+            self._plot_evaluate_besag(geopackage_obj,temp_file_name,1)
+            self._evaluate_besag(true_df.copy(),temp_file_name,2)
+            self._plot_evaluate_besag(geopackage_obj,temp_file_name,2)
+            self._evaluate_bym(true_df.copy(),temp_file_name,1)
+            self._plot_evaluate_bym(geopackage_obj,temp_file_name,1)
+            self._evaluate_bym(true_df.copy(),temp_file_name,2)
+            self._plot_evaluate_bym(geopackage_obj,temp_file_name,2)
+            self._evaluate_satscan(true_df.copy(),temp_file_name)
+            self._plot_evaluate_satscan(geopackage_obj,temp_file_name)
             # break;
         
         del geopackage_obj
@@ -517,8 +508,8 @@ class TestPlayCase2(TestPlayCase):
         del temp_map_with_data,metrics_df
         gc.collect()
 
-    def _evaluate_besag(self,true_df,temp_file_name):
-        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.besag.csv'))
+    def _evaluate_besag(self,true_df,temp_file_name,q:int):
+        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+f'.besag-q{q}.csv'))
         pred_df=pred_df.drop(columns=['most_cl','NAME_1'])
         true_df['total']=true_df['total'].map({
             'mid':'not-hotspot',
@@ -533,25 +524,25 @@ class TestPlayCase2(TestPlayCase):
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
         metrics_df[CustomConfusionMatrix.get_column_names()]=0
-        for i in tqdm(range(len(y_true)),desc="Evaluate BESAG",leave=False):
+        for i in tqdm(range(len(y_true)),desc=f"Evaluate BESAG q={q}",leave=False):
             cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
             metrics_df.iloc[i,1:]=cm.get_values()
-        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.besag.metrics.csv'),index=False)
+        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+f'.besag-q{q}.metrics.csv'),index=False)
         
         del pred_df,y_true,y_pred,metrics_df
         gc.collect()
 
-    def _plot_evaluate_besag(self,geopackage_obj:TestGEOPackage,temp_file_name):
+    def _plot_evaluate_besag(self,geopackage_obj:TestGEOPackage,temp_file_name,q:int):
 
         def _plot_evaluate_one(keyword,cmaps):
             fig, ax = plt.subplots(1, figsize=(12, 12))
             temp_map_with_data.assign(value=metrics_df[keyword].values).plot(ax=ax,column='value',cmap=cmaps,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
             temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
             ax.set_axis_off()
-            plt.savefig(os.path.join(self.output_path, temp_file_name+f".besag.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
+            plt.savefig(os.path.join(self.output_path, temp_file_name+f".besag-q{q}.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
             plt.close('all')    
 
-        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.besag.metrics.csv'))
+        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+f'.besag-q{q}.metrics.csv'))
         temp_map_with_data=geopackage_obj.get_map()
         _plot_evaluate_one('precision','Reds')
 
@@ -566,8 +557,8 @@ class TestPlayCase2(TestPlayCase):
         del temp_map_with_data,metrics_df
         gc.collect()
 
-    def _evaluate_bym(self,true_df,temp_file_name):
-        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.bym.csv'))
+    def _evaluate_bym(self,true_df,temp_file_name,q:int):
+        pred_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+f'.bym-q{q}.csv'))
         pred_df=pred_df.drop(columns=['most_cl','NAME_1'])
         true_df['total']=true_df['total'].map({
             'mid':'not-hotspot',
@@ -582,25 +573,25 @@ class TestPlayCase2(TestPlayCase):
 
         metrics_df=pd.DataFrame(true_df['NAME_1'])
         metrics_df[CustomConfusionMatrix.get_column_names()]=0
-        for i in tqdm(range(len(y_true)),desc="Evaluate BYM",leave=False):
+        for i in tqdm(range(len(y_true)),desc=f"Evaluate BYM q={q}",leave=False):
             cm=CustomConfusionMatrix(np.array([y_true[i]]*self.n_sim),y_pred[i],labels=['not-hotspot','hotspot'])
             metrics_df.iloc[i,1:]=cm.get_values()
-        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+'.bym.metrics.csv'),index=False)
+        metrics_df.to_csv(os.path.join(self.output_path,temp_file_name+f'.bym-q{q}.metrics.csv'),index=False)
         
         del pred_df,y_true,y_pred,metrics_df
         gc.collect()
 
-    def _plot_evaluate_bym(self,geopackage_obj:TestGEOPackage,temp_file_name):
+    def _plot_evaluate_bym(self,geopackage_obj:TestGEOPackage,temp_file_name,q:int):
 
         def _plot_evaluate_one(keyword,cmaps):
             fig, ax = plt.subplots(1, figsize=(12, 12))
             temp_map_with_data.assign(value=metrics_df[keyword].values).plot(ax=ax,column='value',cmap=cmaps,norm=colors.PowerNorm(1,vmin=0,vmax=1),legend=True)
             temp_map_with_data.boundary.plot(edgecolor='black',ax=ax)
             ax.set_axis_off()
-            plt.savefig(os.path.join(self.output_path, temp_file_name+f".bym.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
+            plt.savefig(os.path.join(self.output_path, temp_file_name+f".bym-q{q}.metrics.{keyword}.png"), dpi=150, bbox_inches='tight')
             plt.close('all')    
 
-        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+'.bym.metrics.csv'))
+        metrics_df=pd.read_csv(os.path.join(self.output_path,temp_file_name+f'.bym-q{q}.metrics.csv'))
         temp_map_with_data=geopackage_obj.get_map()
         _plot_evaluate_one('precision','Reds')
 
