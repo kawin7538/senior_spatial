@@ -69,7 +69,7 @@ class TestPlayCase2(TestPlayCase):
             dataloading_obj=TestDataLoading(geopackage_obj,input_df,100)
             self._plot_exp_dist(dataloading_obj,f"{file_name.split('.')[0]}")
 
-            dataloading_obj=TestDataLoading2(input_df,n_sim=self.n_sim)
+            dataloading_obj=TestDataLoading2(input_df,n_sim=self.n_sim,high_mode=self.high_mode)
             dataloading_obj.to_csv(f"{self.output_simdf_path}/{file_name.split('.')[0]}")
 
             del input_df, dataloading_obj
