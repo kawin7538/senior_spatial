@@ -36,12 +36,22 @@ r_run_bym=robjects.globalenv['run_bym']
 r_run_satscan=robjects.globalenv['run_satscan']
 
 class TestPlayCase2(TestPlayCase):
-    def __init__(self,n_sim=100) -> None:
+    def __init__(self,n_sim=100,high_mode=3) -> None:
         # super(TestPlayCase2,self).__init__()
+        assert high_mode in [2,3], "High Mode should be 2 or 3"
         self.n_sim=n_sim
+        self.high_mode=high_mode
         self.input_path="testcase_modules/testcase_input2"
-        self.output_simdf_path="output/testcase_output2/dataframe_sim_output/"
-        self.output_path="output/testcase_output2"
+        self.output_simdf_path=f"output/testcase_output2/high{self.high_mode}/dataframe_sim_output/"
+        self.output_path=f"output/testcase_output2/high{self.high_mode}"
+
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+            print(f'\t{self.output_path} not existed, create it')
+        if not os.path.exists(self.output_simdf_path):
+            os.makedirs(self.output_simdf_path)
+            print(f'\t{self.output_simdf_path} not existed, create it')
+
         self.list_file_name = sorted(set([i for i in os.listdir(
             self.input_path)]), key=lambda x: x.split('.')[0])
         self._check_count_files()
@@ -61,13 +71,6 @@ class TestPlayCase2(TestPlayCase):
 
             dataloading_obj=TestDataLoading2(input_df,n_sim=self.n_sim)
             dataloading_obj.to_csv(f"{self.output_simdf_path}/{file_name.split('.')[0]}")
-
-            # file_name = file_name.split('.')[0]
-            # self._plot_dist(dataloading_obj, file_name)
-            # self._plot_local_gi(dataloading_obj, geopackage_obj, file_name)
-            # self._plot_local_gistar(dataloading_obj, geopackage_obj, file_name)
-            # self._plot_moran(dataloading_obj, geopackage_obj, file_name)
-            # self._plot_geary(dataloading_obj, geopackage_obj, file_name)
 
             del input_df, dataloading_obj
             gc.collect()
@@ -103,14 +106,23 @@ class TestPlayCase2(TestPlayCase):
             gc.collect()
 
     def _plot_exp_dist(self,dataloading_obj: TestDataLoading, file_name):
-        theta_dict={
-            'low':1,
-            'mid':2,
-            'high':3
-        }
+        if self.high_mode==3:
+            theta_dict={
+                'low':1,
+                'mid':2,
+                'high':3
+            }
+            vmax=4
+        else:
+            theta_dict={
+                'low':1,
+                'mid':1,
+                'high':2
+            }
+            vmax=3
         fig, ax = plt.subplots(1, figsize=(12, 12))
         temp_list=dataloading_obj.map_with_data['value'].map(theta_dict).values
-        dataloading_obj.map_with_data.assign(value=temp_list).plot(column='value', legend=True, cmap='seismic', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax,norm=colors.PowerNorm(1,vmin=0,vmax=4))
+        dataloading_obj.map_with_data.assign(value=temp_list).plot(column='value', legend=True, cmap='seismic', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax,norm=colors.PowerNorm(1,vmin=0,vmax=vmax))
         ax.set_axis_off()
         plt.savefig(os.path.join(self.output_path, file_name+".exp_dist.png"), dpi=150, bbox_inches='tight')
         plt.close('all')
@@ -119,8 +131,12 @@ class TestPlayCase2(TestPlayCase):
         gc.collect()
 
     def _plot_mean_dist(self, dataloading_obj: TestDataLoading, file_name):
+        if self.high_mode==3:
+            vmax=4
+        else:
+            vmax=3
         fig, ax = plt.subplots(1, figsize=(12, 12))
-        dataloading_obj.map_with_data.plot(column='value', legend=True, cmap='seismic', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax,norm=colors.PowerNorm(1,vmin=0,vmax=4))
+        dataloading_obj.map_with_data.plot(column='value', legend=True, cmap='seismic', edgecolor=(0, 0, 0, 1), linewidth=1, ax=ax,norm=colors.PowerNorm(1,vmin=0,vmax=vmax))
         ax.set_axis_off()
         # plt.savefig(os.path.join(self.output_path, file_name.split('.')
         #             [0]+".dist.png"), dpi=300, bbox_inches='tight')

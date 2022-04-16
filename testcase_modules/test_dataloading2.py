@@ -9,19 +9,27 @@ from testcase_modules.test_geopackage import TestGEOPackage
 rng=np.random.default_rng(12345)
 
 class TestDataLoading2:
-    def __init__(self, input_df:pd.DataFrame, n_sim=100):
+    def __init__(self, input_df:pd.DataFrame, n_sim=100,high_mode=3):
         self.input_df=input_df
         self.exp_df=pd.read_csv("testcase_modules/DF_case_mean_allyears.csv")
         self.n_sim=n_sim
+        self.high_mode=high_mode
         self.sim_df=pd.DataFrame()
         self._generate_sim()
         
     def _generate_sim(self):
-        theta_dict={
-            'low':1,
-            'mid':2,
-            'high':3
-        }
+        if self.high_mode==3:
+            theta_dict={
+                'low':1,
+                'mid':2,
+                'high':3
+            }
+        else:
+            theta_dict={
+                'low':1,
+                'mid':1,
+                'high':2
+            }
         temp_list_sim_df=[]
         for i in tqdm(range(self.n_sim),desc="Randomizing Sim",leave=False):
             exp_arr=self.exp_df['total'].values*100000
