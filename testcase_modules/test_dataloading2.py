@@ -21,7 +21,7 @@ class TestDataLoading2:
         if self.high_mode==3:
             theta_dict={
                 'low':1,
-                'mid':2,
+                'mid':1,
                 'high':3
             }
         else:
