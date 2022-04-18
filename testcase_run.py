@@ -12,7 +12,7 @@ if __name__ == '__main__':
     tester.action_case()
     tester.evaluate_case()
 
-    tester=TestPlayCase2(n_sim=100,high_mode=3)
-    tester.simulate_case()
-    tester.action_case()
-    tester.evaluate_case()
+    # tester=TestPlayCase2(n_sim=100,high_mode=3)
+    # tester.simulate_case()
+    # tester.action_case()
+    # tester.evaluate_case()
