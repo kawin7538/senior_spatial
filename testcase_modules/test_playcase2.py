@@ -60,7 +60,7 @@ class TestPlayCase2(TestPlayCase):
         return pd.read_json(os.path.join(dir_path, file_name)).rename(columns={'val':'total'}).sort_values(by='NAME_1').reset_index(drop=True)
 
     def simulate_case(self):
-        for file_name in tqdm(sorted(self.list_file_name), desc="Simulating Case"):
+        for file_name in tqdm(sorted(self.list_file_name)[-1:], desc="Simulating Case"):
             input_df = self._read_file(
                 self.input_path, file_name)
             geopackage_obj = TestGEOPackage(
@@ -77,7 +77,7 @@ class TestPlayCase2(TestPlayCase):
 
     def action_case(self):
         geopackage_obj=TestGEOPackage(1,1,"Thailand")
-        for file_name in tqdm(sorted(os.listdir(self.output_simdf_path)),desc="Actioning Case"):
+        for file_name in tqdm(sorted(os.listdir(self.output_simdf_path))[-1:],desc="Actioning Case"):
             input_df=pd.read_csv(os.path.join(self.output_simdf_path,file_name))
             temp_input_df=input_df[['NAME_1']].copy()
             temp_input_df['total']=input_df.set_index("NAME_1").mean(axis=1).values
